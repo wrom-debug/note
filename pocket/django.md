@@ -449,6 +449,8 @@ def index(request):
    #可以在第三个返回值使用locals(),会返回函数内部所有变量以{'变量名':变量值,...}形式的字典
 ~~~
 
+django中如果变量属性名与方法重复会执行属性，及属性优先级比方法高。
+
 #### 过滤器
 
 使用方法`{{变量|过滤器}}`
@@ -465,3 +467,137 @@ def index(request):
 |cut：‘指定字符’|删除字符串中所有指定字符
 |join：“指定字符”|使用指定字符连接列表中所有元素
 |safe|将字符串识别成标签
+
+### 标签(逻辑)
+
+#### for循环标签
+
+~~~html
+
+{% for i in a %}
+   {{forloop.counter}}
+   <h1>哈哈</h1>
+{% empty %} #循环为空时执行
+   <h2>ccc</h2>
+{% endfor %}
+~~~
+
+##### for其他方法
+
+|变量|说明
+|--|--
+|forloop.counter|当前索引值(从1开始)
+|forloop.counter0|当前索引值(从0开始)
+|forloop.revcounter|当前索引值的倒叙(从1开始)
+|forloop.revcounter0|当前索引值的和倒叙(从0开始)
+|forloop.first|如果当前循环是第一次循环就为Tuer
+|forloop.last|如果当前循环是最后一次循环就为Tuer
+|forloop.parentloop|外层循环可以是使用上面的方法
+
+### if标签
+
+~~~html
+
+{% if a == b %}
+   <h1>aaa</h1>
+{% elif a == c %}
+   <h2>bb</h2>
+{% else %}
+   <h3>cc</h3>
+{% endif %}
+~~~
+
+不支持连续判断
+
+### with标签
+
+~~~html
+
+{% with a.c.b.5 as ash %}  #给复杂变量取别名
+
+或者{% with ash=a.c.b.5 %}
+   {{ash}}
+{% endwith %}
+~~~
+
+### csrf_token
+
+~~~html
+
+<form action="" method="post">
+  {% csrf_token %}
+</form>
+~~~
+
+django存在post校验，使用每次生成的form表单中添加随即值的键值对，与提交的数据判断。
+
+### 注释
+
+~~~html
+
+{#注释内容#}
+~~~
+
+## 自定义标签与过滤器
+
+1. 将app添加到setting中[创建app](#安装django并配置使用)
+
+2. 在app中创建templatetags文件夹
+
+3. 在templatetags文件中创建`任意名称.py`文件
+
+4. 在app中创建`任意名称.py`文件并写以下内容
+
+~~~python
+from django import template
+from django.utils.safestring import mark_safe
+
+register = template.Library()   #register的名字是固定的,不可改变
+
+@register.filter
+def filter_multi(v1,v2):
+    return  v1 * v2
+
+@register.simple_tag  #和自定义filter类似，只不过接收更灵活的参数，没有个数限制。
+def simple_tag_multi(v1,v2):
+    return  v1 * v2
+
+@register.simple_tag
+def my_input(id,arg):
+    result = "<input type='text' id='%s' class='%s' />" %(id,arg,)
+    return mark_safe(result)
+~~~
+
+## 模板继承
+
+~~~html
+
+父模板
+内容1
+{% block 钩子名称 %}
+   内容2
+{% endblock %}
+内容3
+
+子模板
+{% extends "户模板文件名" %}
+{% block 父模板钩子名 %}
+   内容4
+{% endblock %}
+~~~
+
+由于大部分模板框架类似就可以在父模板中添加钩子，来替换钩子中的`内容2`生成新的子模板。不过子模板要在一开始使用`{% extends “父模板文件名" %}`指定子模板继承的父模板。
+
+## 组件
+
+~~~html
+
+插入组件模板
+内容1
+{% include "完整功能组件" %}
+内容2
+~~~
+
+组件就是在模板中将完整功能的html文件插入
+组件是提供某一完整功能的模块，如：编辑器组件，QQ空间提供的关注组件等。
+而插件更倾向封闭某一功能方法的函数。
