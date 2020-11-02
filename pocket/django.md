@@ -624,4 +624,5 @@ def show_results(n):
 {% load 静态文件别名 %}
 <img src="/静态文件别名/具体资源">
 <img src="{% 静态文件别名 具体资源 %}">
+<img src={% get_static_prefix %}具体资源>   #{% get_static_prefix %}返回/别名/
 ~~~
