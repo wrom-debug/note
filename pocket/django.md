@@ -89,13 +89,13 @@ Cookie: csrftoken=wbpwiMbku4CIpXWMAb8KiTudh2gPKHC9eaMjnriN4fFSP6dcgRuXwS27GH3eYK
 
 * 片段。以“#”字符为起点
 
-以http://www.luffycity.com:80/news/index.html?id=250&page=1 为例, 其中：
+以`http://www.luffycity.com:80/news/index.html?id=250&page=1`为例, 其中：
 
 http，是协议；
-www.luffycity.com，是服务器；
+`www.luffycity.com`，是服务器；
 80，是服务器上的默认网络端口号，默认不显示；
-/news/index.html，是路径（URI：直接定位到对应的资源）；
-?id=250&page=1，是查询。
+`/news/index.html`，是路径（URI：直接定位到对应的资源）；
+`?id=250&page=1`，是查询。
 大多数网页浏览器不要求用户输入网页中`http://`的部分，因为绝大多数网页内容是超文本传输协议文件。同样，“80”是超文本传输协议文件的常用端口号，因此一般也不必写明。一般来说用户只要键入统一资源定位符的一部分（www.luffycity.com:80/news/index.html?id=250&page=1)就可以了
 
 ### MVC与MTV
@@ -669,4 +669,14 @@ v = reverse('app01:detail', kwargs={'pk':11})
 ~~~html
 
 {% url '空间名称:url别名' pk=12 pp=99 %}
+~~~
+
+## 表单(orm)
+
+在应用文件夹下models.py在中创建orm对象
+
+~~~python
+
+models.py
+class Book(models.Model):
 ~~~
