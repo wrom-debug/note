@@ -626,3 +626,47 @@ def show_results(n):
 <img src="{% 静态文件别名 具体资源 %}">
 <img src={% get_static_prefix %}具体资源>   #{% get_static_prefix %}返回/别名/
 ~~~
+
+### url别名
+
+就是在url匹配时给，某个匹配模式起一个别名方便模板或者视图指定对应url
+
+url.py配置如下
+
+~~~python
+
+url(r"^home/",views.home,name="home")
+url(r"^index/(\d)",views.index,name)
+~~~
+
+模板中这么设置
+
+~~~html
+
+{% url "home" %}  #渲染时django就会将其解析成对应的url及(/home/)省略域名
+{% url 'index' 参数 %}
+~~~
+
+视图函数中这么设置
+`reverse("url别名",args=(传递的参数,))`
+
+~~~python
+
+return redirect(reverse('index',arg=(1,)))
+~~~
+
+如果有路由分发的情况在具体应用中的路由分发中设置别名，不同应用下url别名可以相同。但是要在总路由分发时设置`url(r'^app02/', include('app02.urls',namespace='app02'))`或者在app路由分发下设置`app_name = 'app01'`来区分别名空间
+
+视图中设置
+
+~~~python
+
+v = reverse('app01:detail', kwargs={'pk':11})
+~~~
+
+模板中设置
+
+~~~html
+
+{% url '空间名称:url别名' pk=12 pp=99 %}
+~~~
