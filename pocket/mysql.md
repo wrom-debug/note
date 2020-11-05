@@ -29,6 +29,8 @@ mysql -h地址 -u账户 -p密码
 
 ~~~SQL
 mysql> update mysql.user set authentication_string=password('new passwd') where user='root' and Host ='localhost';
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';
 ~~~
 
 ## 用户操作
@@ -59,6 +61,12 @@ grant 权限类型[all全部      select 查       insert 写入 ] on 数据库.
 flush privileges;
 ~~~
 
+### 查看用户
+
+~~~SQL
+select user from mysql.user
+~~~
+
 ## 数据库操作
 
 ### 查看数据库
@@ -80,7 +88,7 @@ create database wormdb charset=utf8;
 查看wormdb的编码格式
 
 ~~~SQL
-shuow create database wormdb;
+show create database wormdb;
 ~~~
 
 ### 查看当前所在库
