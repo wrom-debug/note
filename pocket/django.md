@@ -673,10 +673,162 @@ v = reverse('app01:detail', kwargs={'pk':11})
 
 ## 表单(orm)
 
+### 创建表
+
 在应用文件夹下models.py在中创建orm对象
 
 ~~~python
 
 models.py
 class Book(models.Model):
+   字段名称=models.字段类型(参数)
 ~~~
+
+|字段方法|说明|特殊参数|
+|---|---|---|
+|CharField|短字符串|max_length(最大长度)|
+|IntegerField|整数|无|
+|DecimField|浮点数|max_digits(总长度)、decimal_places(小数位数)|
+|AutoField|自增整型|无|
+|BooleanField|布尔型|无|
+|TextField|长字符串|无|
+|EmailField|自带检测邮箱格式的字符串|max_length(不可用)无|
+|DateField|日期|auto_now(更新或保存时间)、auto_add(记录创建时间)|
+|DateTimeField|日期时间|与DateField相同|
+|ImageField|自带验证图片存储|height_field(高度)、width_field(宽度)|
+|FileField|文件|uploda_to(上传文件存储位置)|
+|URLField|url保存，会印证有效性|无|
+|NullBootleanField|可以为空的布尔型|无|
+|SlugField|标签|无|
+|XMLField|带校验的XML|schema_path(存放路径)|
+|FilePathField|文件|path(存储路径)、match(正则表达式)、recursive(是否包含路径下所有子文件夹)|
+|IPAddressField|字符串形式的IP地址|无|
+|CommaSeparatedIntegerField|用于逗号分隔的整数值|max_length(最大长度)|
+
+|参数|说明|示例|
+|--|--|--|
+|null|是否NULL|null=Ture(可以为空)|
+|blank|是否可以不填|blank=True(填写时可以不填内容)
+|default|默认值|default="asd"(默认值为'asd')|
+|primary_key|是否为主键|primary_key=True(字段为主键)|
+|unique|唯一|unique=True(不可重复)|
+|choices|设置字段为列表或元组|不清楚|
+|db_index|字段设置索引|db_index=Tuer(本字段设置数据库索引)|
+|auto_now_add|创建记录时添加时间到字段(时间字段使用)|auto_now_add=True(记录创建记录时)|
+|auto_now|每次更新数据记录时间(时间字段使用)|auto_now=True(记录最后一次更新的时间)|
+
+### 连接数据库
+
+1. 在setting中做如下设置
+
+~~~python
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME':'bms',     　　 　  # 要连接的数据库，连接前需要创建好
+        'USER':'root',　　　　　　  # 连接数据库的用户名
+        'PASSWORD':'',　　　　　　  # 连接数据库的密码
+        'HOST':'127.0.0.1',       # 连接主机，默认本级
+        'PORT'：3306    　　　     #  端口 默认3306
+    }
+}
+~~~
+
+2. 在项目文件__init__.py中设置
+
+~~~python
+
+import pymysql
+pymysql.install_as_MYSQLdb()
+~~~
+
+3. 执行数据库同步指令
+
+~~~shell
+
+python manage.py makemigrations
+python manage.py migrate
+~~~
+
+### 单表操作
+
+增
+
+~~~python
+
+创建记录：方式1
+student_obj=models.Student(
+   name='xxx',
+   age=18
+)
+student_obj.seve()
+
+创建记录：方式2
+nwe_obj=models.Student.objects.create(name='oo',age=18)
+
+创建记录：方式3 批量创建
+orm_list=[]
+for i in range(1,1000000):
+   obk=models.Student(
+      name='xxo',
+      age=i
+   )
+   orm_list.appden(obk)
+models.Student.objects.bulk_create(orm_list)
+
+创建记录：方式4 有就更新，没有就创建
+models.Student.objects.update_or_create(
+   name="asd",
+   age=18
+)
+
+添加时间
+import datetime
+t=date
+创建记录时时间字段=t
+~~~
+
+查
+
+~~~python
+
+查询全部
+all=models.Student.objects.all() #返回类似列表-queryset集合
+
+条件查找
+fil=models.Student.objects.filter(age=18) #返回queryset集合
+
+条件查找
+obj=models.Student.objects.get(id=1)   #返回modle对象，必须只有一个结果
+~~~
+
+删
+
+~~~python
+
+删除
+查找.delete()
+~~~
+
+改
+
+~~~python
+查找.update(要修改的字段=新值)
+~~~
+
+|其他方法|说明|
+|---|---|
+|all()|返回所有记录，返回queryset|
+|filter()|返回所有符合筛选条件的对象，返回queryset，可以设置多个筛选条件，如果传递字典数据用**打散。|
+|get()|返回与所给筛选条件相匹配的对象，不是queryset类型，是行记录对象，返回结果有且只有一个，如果符合筛选条件的对象超过一个或者没有都会抛出错误。|
+|exclude()|排除的意思，它包含了与所给筛选条件不匹配的对象，没有不等于的操作昂，用这个exclude，返回值是queryset类型|
+|order_by()|queryset类型的数据来调用，对查询结果排序,默认是按照id来升序排列的，返回值还是queryset类型，传递'-price'降序，传递'price'升序|
+|reverse()|queryset类型的数据来调用，对查询结果反向排序，返回值还是queryset类型|
+|count()|queryset类型的数据来调用，返回数据库中匹配查询(QuerySet)的对象数量|
+|first()|queryset类型的数据来调用，返回第一条记录，得到的都是model对象，不是queryset|
+|last()|queryset类型的数据来调用，返回最后一条记录,结果为model对象类型|
+|exists()|queryset类型的数据来调用，如果QuerySet包含数据，就返回True，否则返回False，本质时判断第一条数据是否存在|
+|values()|返回可迭代的字典序列，特殊的QuerySet|
+|vlaues_list|返回的是一个元组序列，特殊的QuerySet|
+|distinct|values和values_list得到的queryset类型的数据来调用，从返回结果中剔除重复纪录|
