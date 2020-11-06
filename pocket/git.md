@@ -65,6 +65,12 @@ git commit
 git push -u origin 分支名称（默认master）
 ~~~
 
+## 获取更新所有更新
+
+~~~shell
+git fetch --all
+~~~
+
 ## 更新本地仓库
 
 ~~~shell
