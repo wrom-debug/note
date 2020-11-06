@@ -25,6 +25,14 @@ service mysql restart       #重启
 mysql -h地址 -u账户 -p密码
 ~~~
 
+### 设置客户端地址
+
+修改`/etc/mysql/mysql.conf.d/mysqld.cnf`注释如下内容
+
+~~~shell
+bind-addrs =127.0.0.1
+~~~
+
 ### 修改默认帐号和密码
 
 ~~~SQL
