@@ -41,7 +41,7 @@ conn.send(b'hello')
 
 7. OPTIONS：    这个方法可以使服务器传回该资源所支持的所有HTTP请求方法。用'*'来代替资源名称，向Web服务器发送OPTIONS请求，可以测试服务器功能是否正常运作。
 
-8. CONNECT：    HTTP/1.1协议中预留给能够将连接改为管道方式的代理服务器。通常用于SSL加密服务器的链接（经由非加密的HTTP代理服务器）。
+8. CONNECT：    HTTP/1.1协议中预留给能够将链接改为管道方式的代理服务器。通常用于SSL加密服务器的链接（经由非加密的HTTP代理服务器）。
 
 示例：
 
@@ -100,7 +100,7 @@ http，是协议；
 
 ### MVC与MTV
 
-　Web服务器开发领域里著名的MVC模式，所谓MVC就是把Web应用分为模型(M)，控制器(C)和视图(V)三层，他们之间以一种插件式的、松耦合的方式连接在一起，模型负责业务对象与数据库的映射(ORM)，视图负责与用户的交互(页面)，控制器接受用户的输入调用模型和视图完成用户的请求，其示意图如下所示：
+　Web服务器开发领域里著名的MVC模式，所谓MVC就是把Web应用分为模型(M)，控制器(C)和视图(V)三层，他们之间以一种插件式的、松耦合的方式链接在一起，模型负责业务对象与数据库的映射(ORM)，视图负责与用户的交互(页面)，控制器接受用户的输入调用模型和视图完成用户的请求，其示意图如下所示：
 
 ![MVC流程图](img/6.png "MVC流程图")
 
@@ -465,7 +465,7 @@ django中如果变量属性名与方法重复会执行属性，及属性优先�
 |tuncatechars:'9'|字符省略（加上三点一共的字符）
 |tuncatewords:'3'|单词省略（显示3个单词）
 |cut：‘指定字符’|删除字符串中所有指定字符
-|join：“指定字符”|使用指定字符连接列表中所有元素
+|join：“指定字符”|使用指定字符链接列表中所有元素
 |safe|将字符串识别成标签
 
 ### 标签(逻辑)
@@ -673,6 +673,15 @@ v = reverse('app01:detail', kwargs={'pk':11})
 
 ## 表单(orm)
 
+### admin
+
+在项目路径下执行`python manage.py createsuperuser`创建超级用户并输入用户名与密码,密码强度不可以太低(数字字母不少于8位)并在应用admin.py在中进行如下设置(注册表)。
+
+~~~python
+
+admin.site.register(models.表名)
+~~~
+
 ### 创建表
 
 在应用文件夹下models.py在中创建orm对象
@@ -717,7 +726,7 @@ class Book(models.Model):
 |auto_now_add|创建记录时添加时间到字段(时间字段使用)|auto_now_add=True(记录创建记录时)|
 |auto_now|每次更新数据记录时间(时间字段使用)|auto_now=True(记录最后一次更新的时间)|
 
-### 连接数据库
+### 链接数据库
 
 1. 在setting中做如下设置
 
@@ -726,10 +735,10 @@ class Book(models.Model):
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':'bms',     　　 　  # 要连接的数据库，连接前需要创建好
-        'USER':'root',　　　　　　  # 连接数据库的用户名
-        'PASSWORD':'',　　　　　　  # 连接数据库的密码
-        'HOST':'127.0.0.1',       # 连接主机，默认本级
+        'NAME':'bms',     　　 　  # 要链接的数据库，链接前需要创建好
+        'USER':'root',　　　　　　  # 链接数据库的用户名
+        'PASSWORD':'',　　　　　　  # 链接数据库的密码
+        'HOST':'127.0.0.1',       # 链接主机，默认本级
         'PORT'：3306    　　　     #  端口 默认3306
     }
 }
@@ -850,3 +859,116 @@ obj=models.Student.objects.get(id=1)   #返回modle对象，必须只有一个�
 双下划线可以连续下划
 
 ### 多表操作
+
+创建表
+
+~~~python
+
+一对一
+在其中一个表中添加字段
+xx = models.OneToOneField(to='表名',to_field='字段名',on_delete=models.CASCADE)  
+
+to_field可以不写,默认是关联到另一张表的主键,on_delete在1.x版本的django中不用写,默认是级联删除的,2.x版本的django要写(被关联的记录删除，关联记录也跟着删除)
+
+一对多
+xx = models.ForeignKey(to='表名',to_field='字段名',on_delete=models.CASCADE)
+
+多对多   #只要在一个表中添加
+xx = models.ManyToManyField(to='另外一个表名') #这是自动创建第三表
+
+class BookToAuthor(models.Model):
+   book_id = models.ForeignKey(to='Book')
+   author_id = models.ForeignKey(to='Author')
+~~~~
+
+增
+
+~~~python
+
+一对一增加
+obj=创建记录
+obj1=查询一条记录的models对象
+方式1
+models.student.objects.create(
+   ...
+   外键字段=obj
+)
+方式2
+models.student.objects.create(
+   ...
+   外键字段=obj1.id
+)
+
+一对多
+方式1
+models.student.objects.create(
+   ...
+   外键字段=obj
+)
+方式2
+models.student.objects.create(
+   ...
+   外键字段=obj1.id
+)
+
+多对多
+obj.外键字段.add(*[obj1.id,obj2.id])
+obj.外键字段.add(*[obj1,obj2])
+~~~
+
+删
+
+~~~python
+
+一对多的删除与一对一删除是相同的(被链接的记录删除时，链接记录也被删除，及树倒猢狲散)
+models.student.objects.get(id=1).delete()
+
+多对多
+obj.authors.remove(obj.id)
+obj.authors.remove(*[obj.id])
+obj.authors.remove(6)   #删除与obj记录与关联表中id为6记录的链接
+obj.authors.clear()  #清除obj记录与关联标中记录的所有链接
+obj.authors.set(*[1,2]) #设置obj记录与关联表中的id为1与2之间的链接，回清除之前的链接
+~~~
+
+改
+
+~~~python
+
+一对一和一对多相同
+查询.update(
+   外键=关联记录modlee或者关联记录.id
+)  #由于默认没有设置级联更新，所以‘树’不可以改
+~~~
+
+#### 查询
+
+关联字段写在a表中，从a表去查询被关联表中的数据叫做正向查询，反之叫反向查询
+
+obj1:有关联字段的modles
+obj2:被关联的modles
+
+##### 跨表查询（子查询）
+
+~~~mermaid
+graph LR
+f[一对一]
+    A(ojb1) -->|正向查询:对象.关联属性|B(ojb2)
+    B -->|反向查询:对象.小写类名| A
+~~~
+
+~~~mermaid
+graph LR
+f[一对多]
+    A(ojb1) -->|正向查询:对象.关联属性|B(ojb2)
+    B -->|反向查询:对象.小写类名_set| A
+~~~
+
+~~~mermaid
+graph LR
+f[多对多]
+    A(ojb1) -->|正向查询:对象.关联属性|B(ojb2)
+    B -->|反向查询:对象.小写类名| A
+~~~
+
+##### 跨表/连表查询（双下划线）
