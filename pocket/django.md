@@ -950,6 +950,13 @@ obj2:被关联的modles
 
 ##### 跨表查询（子查询）
 
+~~~python
+
+ #查询主键为1的书籍的出版社所在的城市
+book_obj=models.Book.objects.filter(pk=1).first()
+print(book_obj.publish.city)
+~~~
+
 ~~~mermaid
 graph LR
 f[一对一]
@@ -968,7 +975,49 @@ f[一对多]
 graph LR
 f[多对多]
     A(ojb1) -->|正向查询:对象.关联属性|B(ojb2)
-    B -->|反向查询:对象.小写类名| A
+    B -->|反向查询:对象.小写类名_set| A
 ~~~
 
 ##### 跨表/连表查询（双下划线）
+
+~~~python
+
+正向查询
+obj = models.Author.objects.filter(name='崔老师').values('authorDetail__telephone')
+
+反向查询
+ obj = models.AuthorDetail.objects.filter(author__name='崔老师').values('telephone')
+~~~
+
+`obj = models.表.objects.filter(已知).values(未知)`
+
+正向还是反向是由models后面的`表`决定的，filter中的条件是由`已知`决定的，如果`已知`字段就在表没有关系，如果再关联的表中就看正反向,正向就是`关联字段__字段`,反向就是`小写表名__字段`，values中的字段也与filter相同。
+
+##### 聚合、分组、F查询和Q查询
+
+聚合
+
+~~~python
+
+from django.db.models import Avg,Max,Min,Sum,Count   #聚合函数
+models.Book.objects.all().annotate(Avg="price") #返回一个字典
+~~~
+
+分组
+
+~~~python
+
+models.emp.objects.values('dep').annotate(c=Count"id")   #先使用alues进行分组，在使用annotate(c=Count"id")进行聚合，其中聚合函数起别名是必须的。可以使用连表查询与子查询。
+~~~
+
+F查询和Q查询
+
+~~~python
+
+from django.db.models import F,Q
+F 针对自己单表
+filter(a=F('id')*2) #获取值可以计算
+
+Q & | ～
+filter(Q(xx=11)|Q(ss=22))  #Q（变量）做成可判断逻辑
+~~~
