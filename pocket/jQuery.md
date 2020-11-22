@@ -283,6 +283,27 @@ $(document).ready(function(){js代码});
 
 为了保证js代码的在整个页面加载后执行,需要将js代码放到以上方法中.
 
+### ajax
+
+~~~js
+$("").click(function(){$.ajax(
+    url:'请求地址',
+    type:'请求类型',
+    processData: false ,    // 不处理数据
+    contentType: false,    // 不设置内容类型
+    data:{传递参数
+        a：12
+        b：13
+    },
+    success:function(response){
+        响应处理
+    }
+    }
+)
+~~~
+
+contentType还可以设置json指定传递参数的格式为json
+
 ## 动画效果
 
 ~~~js
