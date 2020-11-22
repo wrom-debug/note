@@ -1021,3 +1021,59 @@ filter(a=F('id')*2) #获取值可以计算
 Q & | ～
 filter(Q(xx=11)|Q(ss=22))  #Q（变量）做成可判断逻辑
 ~~~
+
+### 锁
+
+加互斥锁
+
+~~~python
+models.Author.objects.select_for_update().filter(name='崔老师').values('authorDetail__telephone')
+~~~
+
+### 事务
+
+全局开启
+
+修改settings中的ATOMIC_REQUESTS设置为True
+
+~~~python
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mxshop',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': '123',
+        'OPTIONS': {
+            "init_command": "SET default_storage_engine='INNODB'",
+　　　　　　　#'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", #配置开启严格sql模式
+
+
+        }
+        "ATOMIC_REQUESTS": True, #全局开启事务，绑定的是http请求响应整个过程
+        "AUTOCOMMIT":False, #全局取消自动提交，慎用
+    }，
+}
+~~~
+
+局部使用事务
+
+~~~python
+
+给视图函数添加
+from django.db import transaction
+@transaction.atomic
+def index(request):
+   pass orm...sql..
+   return xxx
+
+ 上下文逻辑添加
+ def index(request):
+   ..
+   with transaction.atomic():
+      pass orm...sql..
+   ...
+   return xxx
+~~~
