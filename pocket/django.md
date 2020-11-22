@@ -1077,3 +1077,108 @@ def index(request):
    ...
    return xxx
 ~~~
+
+## cookie与session
+
+### cookie
+
+由于http协议无状态，为让服务器对用户状态进行识别使用的一种浏览器技术
+
+#### 获取cookie
+
+~~~python
+
+request.COOKIES['key']
+request.get_signed_cookie(key,default=RAISE_ERROR,salt='',max_age=None)
+~~~
+
+* default:默认值
+* salt:加密盐
+* max_age:过期时间
+
+#### 设置cookie
+
+~~~python
+
+提前获取响应对象re
+re.set_cookeie=(key,value)
+re.set_signed_cookie(key,value,salt='加密盐',max_age=None,...)
+~~~
+
+* key:键
+* value:值
+* max_age:超时时间,以秒为单位,设置None为关闭浏览器失效
+* expires:超时时间,一个datatime对象
+* path:cookie生效路径
+* domain:cookie生效域名
+* secure:是否使用https来传递cookie
+* httponly:是否只能被http协议传输
+
+#### 删除cookie
+
+~~~python
+
+提前获取响应对象re
+re.delete_cookie(key)
+~~~
+
+### session
+
+由于cookie存储在客户端不安全,并且没有cookie的4096字节限制
+
+#### 获取session
+
+~~~python
+
+request.session[key]
+request.session.get(key,没有返回值)
+~~~
+
+获取cookie中session的值,并使用该值在数据库中查询对应记录,并且解密.并使用get获取key对应的值.
+
+#### 设置session
+
+~~~python
+
+request.session[key]=value
+request.session.setdefault(key,vaule)  #存在就不执行
+~~~
+
+#### 删除值
+
+~~~python
+
+del request.session[key]
+~~~
+
+#### 其他方法
+
+~~~python
+
+获取所有键,值,键值对
+request.session.keys()
+request.session.vaules()
+request.session.items()
+
+获取session值
+request.session.session_key
+
+删除过期记录
+request.session.clear_expired()
+
+检查session_id是否数据库中
+request.session.exists(session_key)
+
+删除当前session全部内容
+request.session.delets()
+
+删除当前会话session全部内容并且删除cookie内容
+request.session,flush()
+
+设置会话session超时时间
+request.session.set_expiry(value)
+value=0  #关闭浏览器就失效
+value=数值  #多少秒后失效
+value=datatime #datarime时间后失效
+value=None #依赖全局失效策略
+~~~
