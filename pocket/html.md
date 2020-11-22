@@ -222,12 +222,13 @@ colspan属性：向右合并单元格
 
 ~~~html
 
-  <from name="" method="" action="" ></from>
+  <from name="" method="" action="" enctype="multipart/form-data"></from>
 ~~~
 
 - name属性：表单名称
 - method属性：提交方式（get安全性交低、post安全性较高）
 - action属性：发送的地址，必须是有效的url
+- enctype="multipart/form-data":上传文件
 
 #### input-输入标签
 
