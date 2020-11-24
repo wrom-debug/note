@@ -1182,3 +1182,57 @@ value=数值  #多少秒后失效
 value=datatime #datarime时间后失效
 value=None #依赖全局失效策略
 ~~~
+
+## 中间件
+
+中间件就是对请求到视图函数，与视图函数响应到浏览器中进行处理，可以在settings中设置创建一个任意名称文件夹，并在其中创建任意名称的py文件。
+
+~~~python
+
+setting.py
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app01.文件夹.py文件.创建中间件类名'
+]
+~~~
+
+创建的py文件这样设置
+
+~~~python
+
+from django.utils.deprecation import MiddlewareMixin
+
+class MD1(MiddlewareMixin):
+    #自定义中间件，不是必须要有下面这方法
+    def process_request(self, request):   #请求执行
+        print("MD1里面的 process_request")
+
+    def process_response(self, request, response): #响应执行
+        print("MD1里面的 process_response")
+        return response
+
+   def process_view(self, request, view_func, view_args, view_kwargs):  #路由分发或执行
+        print("-" * 80)
+        print("MD1 中的process_view")
+        print(view_func, view_func.__name__) #路由分发的函数名
+
+   def process_exception(self, request, exception):   #视图函数报错
+        print(exception)
+        print("MD1 中的process_exception")
+        return HttpResponse(str(exception))
+
+    def process_template_response(self, request, response): #视图函数返回render（）执行
+        print("MD1 中的process_template_response")
+        return response
+~~~
+
+具体流程如图
+
+![中间件流程图](img/10.png '中间件流程图')
