@@ -1236,3 +1236,181 @@ class MD1(MiddlewareMixin):
 具体流程如图
 
 ![中间件流程图](img/10.png '中间件流程图')
+
+## from组件
+
+对前端输入进行后端校验的集成模块
+
+使用方法：
+
+~~~python
+
+views.py
+
+from django import forms
+
+class MyForm(forms.Form):
+   数据名=forms.数据类型(
+      属性=属性值
+   )
+
+def from(request):
+   form_obj=MyForm() #生成对象
+   if request.method=='get':
+      return render(request,'form.html',{'form_obj':form_obj}) #对请求进行判断，如果是get就返回模板界面并传递‘空’对象
+   else :
+      form_obj=MyForm(request.POST) #将返回数据拿来生成一个新的对象
+      if form_obj.is_valid(): #对提交数据进行合法校验
+         print(form_obj.cleaned_date)  #提交书数据的字典
+         return render(request,'登陆成功.html')
+      else ：
+         return render(request,'form.html',{'form_obj':form_obj}) #提交数据不合法返回之前提交的数据与错误信息
+~~~
+
+~~~html
+
+form.html
+
+<form action='' method='post'>
+   {% csrf_token %}  #token校验
+   <label for=''>{{ form_obj.数据名.label }}</label>  #输入数据标签
+   {{ form_obj.数据名 }}   #数据输入处随数据类型改变样式，及input中的type
+   {{ form_obj.数据名.errors.0 }}   #数据第一条错误信息，由于get请求传递的参数无错误，就不显示
+</form>
+~~~
+
+### forms数据类型
+
+~~~python
+
+class MyForm(forms.Form):
+   name=forms.CharField(
+      required=True,   #默认为True，内容不可为空
+      min_length=6,  #最小长度
+      label='名字',  #标识
+      initial='默认值',  #初始值
+      widget=forms.widgets.TextInput,  #明文显示
+   )  #字符输入
+   password=orms.CharField(
+      required=True,   #默认为True，内容不可为空
+      min_length=6,  #最小长度
+      label='密码',  #标识
+      initial='默认值',  #初始值
+      widget=forms.widgets.PasswordInput,  #密文显示
+   sex=forms.ChoiceField(
+      choices=((1,'男'),(2,'女'),(3,'保密')),   #选项
+      widget=forms.widgets.RadioSelect, #radio单选框
+   )  #单选
+   city=forms.ChoiceField(
+      choices=((1,'北极'),(2,'南极'),(3,'赤道')),   #选项
+      widget=forms.widgets.Select, #select下拉单选框
+   )  #下拉单选
+   hobby=forms.MultipleChoiceField(
+      choices=((1,'抽烟'),(2,'喝酒'),(3,'烫头'))，   #选项
+      widget=forms.widgets.CheckboxSelectMultiple, #choeckbox多选
+   )  #方形多选
+   hobby2=forms.MultipleChoiceField(
+      choices=((1,'抽烟'),(2,'喝酒'),(3,'烫头'))，   #选项
+      widget=forms.widgets.SelectMultiple, #下拉多选
+   )  #下拉多选
+   ok=forms.ChoiceField(
+      choices=(('Ture','1'),('False','o')), #选项只显示一个方框
+      widget=forms.widgets.CheckboxInput, #单选方框
+   )  #单选方框
+   date=forms.DateField(
+      widget=forms.widgets.TextInput(attrs={'type':'date'}), #时间
+   )  #时间
+~~~
+
+![数据类型](img/11.png '数据类型')
+
+### form内置字段
+
+~~~python
+
+一般字段
+   required=True, #是否允许为空
+   widget=None,  #HTML插件
+   label=None, #用于生成label标签的内容
+   initial=None,  #初始值
+   help_text='',  #帮助信息(在标签旁显示)
+   error_messages=None, #错误信息{'校验字段':'提示'，}
+   validators=[], #自定义验证
+   localize=False,   #是否支持本地化￥￥￥
+   disabled=False,   #时候可以编辑
+   label_suffix=None, #Label内容后缀￥￥￥
+CharField
+   max_length=None,  #最大长度
+   min_length=None,  #最小长度
+   strip=True，   #是否移除用户输入的空白￥￥￥
+IntegerField
+   max_value=None,   #最大值
+   min_value=None,   #最小值
+FloatField
+   ...
+DecimalField(IntegerField)
+   max_value=None,  #最大值
+   min_value=None,  #最小值
+   max_digits=None, #总长度
+   decimal_places=None,   #小数位长度
+BaseTemporalField(Field)
+   input_formats=None  #时间格式化￥￥￥
+~~~
+
+### 自定义校验
+
+~~~python
+
+from django.core.validators import RegexValidator
+validators=[RegexValidator(r'[0-9]'.'输入一个数字'),] #自定义一个正则校验，可以在列表中可以写多个校验方式，要均符合所有校验。
+~~~
+
+### 是定义校验函数
+
+~~~python
+
+from django.core.exceptions import ValidationError
+import re
+
+def my_validate(num):
+   r=re.compile(r'[0-9]{8}')
+   if not r.match(num):
+      raise ValidationError('请输入8位数字')
+
+validators=[my_validate,]
+~~~
+
+### 钩子
+
+#### 局部钩子
+
+~~~python
+
+   #自动执行校验，通过要return value
+class myform(Form):
+   def clean_字段(self):
+       value = self.cleaned_data.get("username")
+        if "666" in value:
+            raise ValidationError("光喊666是不行的")
+        else:
+            return value
+~~~
+
+#### 全局钩子
+
+~~~python
+
+class myform(Form):
+   def clean(self):
+      value = self.cleaned_data
+        if "666" in value.get('username'):
+            self.add_error("应该报错字段",'光喊666是不行的')
+            raise ValidationError("光喊666是不行的")
+        else:
+            return value
+~~~~
+
+局部钩子只可以对但个字段进行操作全局钩子可以对所有字段进行操作，就是在函数名不同与返回value不同。
+
+form校验执行流程，字段校验-局部钩子，每个字段由上到下执行后执行全局钩子。
+
