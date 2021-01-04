@@ -1408,9 +1408,98 @@ class myform(Form):
             raise ValidationError("光喊666是不行的")
         else:
             return value
-~~~~
+~~~
 
 局部钩子只可以对但个字段进行操作全局钩子可以对所有字段进行操作，就是在函数名不同与返回value不同。
 
 form校验执行流程，字段校验-局部钩子，每个字段由上到下执行后执行全局钩子。
 
+### 批量添加样式
+
+~~~python
+
+class LoginForm(forms.Form):
+    username = forms.CharField(
+        min_length=8,
+        label="用户名",
+        initial="张三",
+        error_messages={
+            "required": "不能为空",
+            "invalid": "格式错误",
+            "min_length": "用户名最短8位"
+        }
+def __init__(self, *args, **kwargs):
+   super(LoginForm, self).__init__(*args, **kwargs)
+   for field in iter(self.fields):
+      self.fields[field].widget.attrs.update({
+            'class': 'form-control'
+   })
+~~~
+
+使用__init__在构造对象时在每个字段的样式字段添加内容
+
+### form选择字段选项为mod中的记录
+
+~~~python
+
+publishs = forms.ModelChoiceField(
+        label='出版社',
+        queryset=models.Publish.objects.all(),  #单选
+    )
+
+    authors = forms.ModelMultipleChoiceField(
+        label='作者',
+        queryset=models.Author.objects.all(),   #多选 
+
+    )
+~~~
+
+## modelform
+
+~~~python
+
+from django.core.exceptions import ValidationError
+class BookModelForm(forms.ModelForm):
+   authors = forms.ModelMultipleChoiceField(
+        label='作者',
+        queryset=models.Author.objects.all(),)  #是定义字段
+
+   class Meta:
+        model = models.Book
+        # fields=['title','publishs',]
+        fields='__all__'   #将models所有字段创建
+        # exclude = ['title','xx',] #将列表中元素排除
+        字段属性={"字段":"属性值",}
+~~~
+
+modelsfrom的局部、全局钩子、批量添加操作与form一致
+
+~~~python
+
+model = models.Book  # 对应的Model中的类
+fields = "__all__"  # 字段，如果是__all__,就是表示列出所有的字段
+exclude = None  # 排除的字段
+labels = None  # 提示信息
+help_texts = None  # 帮助提示信息
+widgets = None  # 自定义插件
+error_messages = None  # 自定义错误信息
+error_messages = {
+    'title':{'required':'不能为空',...} #每个字段的所有的错误都可以写
+}
+~~~
+
+### modelForm保存
+
+~~~python
+
+form_obj = BookForm(request.POST)
+if form_obj.is_valid():
+   form.save() #创建保存
+
+form_obj = BookForm(request.POST，instance=book_obj)  #指定之前的记录
+if form_obj.is_valid():
+   form.save() #更新保存
+
+~~~
+
+## 同源机制
