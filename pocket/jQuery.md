@@ -304,6 +304,22 @@ $("").click(function(){$.ajax(
 
 contentType还可以设置json指定传递参数的格式为json
 
+#### ajax处理token校验
+
+token机制就是在cookie中或请求头中放上加密方式A处理后的值(一般不会随着请求改变)，并在请求的form标签中添加加密方式B处理的值，通过对二者值的解密并对比判断一致性，来作为请求是否是跨站的后端判断依据。
+
+~~~js
+
+data中传递html界面中的token值
+$.ajax({data:{csrfmiddlewaretoken:$('[name=csrfmiddlewaretoken]').val(),//csrfmiddlewaretoken:'{{ csrf_token }}',})
+
+headers中添加cookie中的token值
+$.ajax({headers:{
+    "X-CSRFToken": $.cookie('csrftoken'),
+    },})
+    #需要导入juery.cookie库
+~~~
+
 ## 动画效果
 
 ~~~js
