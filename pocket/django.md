@@ -1503,3 +1503,24 @@ if form_obj.is_valid():
 ~~~
 
 ## 同源机制
+
+浏览器的一个安全机制，非同源不允许直接相互访问,同源就是协议、域名(ip地址)、端口号均相同。
+
+请求分简单请求与复杂请求,简单请求只发送一次请求，而复杂请求会在正式发送时提前发送一次预检，只有预检请求通过后正式请求才会发送。
+
+简单请求:
+
+1. 使用get、post、head请求方法
+2. HTTP头中不超过Accept、Accept-Language、Content-Language、Last-Eent-ID、Content-Type(只限于三个值:application/x-www-form-urlencoded、multipart/form-data、text/plain)
+
+~~~python
+
+def index(request):
+    a = {'name':'chao'}
+    ret = JsonResponse(a)
+    ret["Access-Control-Allow-Origin"] = "http://127.0.0.1:8000" #让http://127.0.0.1:8000这个网址的所有请求都能通过同源机制获得我给他响应的数据
+   ret["Access-Control-Allow-Headers"] = "content-type" #让所有的请求数据格式都能通过同源机制，
+   return ret
+~~~
+
+### 分页
