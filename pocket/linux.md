@@ -443,6 +443,7 @@ ctime 改动时间  元数据发生变化
 |cp 原文件 路径|复制 -i 显示提示 -n 不覆盖 -r 递归复制 -d 只复制连接文件，不复制源文件 -a 归档 -v 显示过程 -b 备份原来的文件文件 -p 保留原来的属性|
 |mv 原文件 新文件名/路径|移动或者重命名 -i 显示提示 -f 强制 -b 备份 |
 |file 文件| 查看文件类型|
+|dd if=输出文件 of=出入文件 bs=读取大小 count=次数 |读取一个文件输入到另外一个文件中|
 
 ##### 复制说明
 
@@ -767,4 +768,19 @@ vim [option] file
       * 垂直添加 strl+w v
       * 取消邻近窗口 strl+w q
       * 取消全部窗口 strl+w o
- 
+11. 工作特性
+    * 全局有效 /etc/vimrc
+    * 对当前用户有效 ～/.vimrc
+    * 设置行号 set nu 取消 set nonu
+    * 搜索忽略大小写 set ic 取消 set noic
+    * 自动缩进 set ai 取消 set noai
+    * 设置搜索匹配内容高亮显示 set his 取消 set nohis
+    * 设置语法高亮 syntax on 取消 syntax off
+    * 文件格式
+      * windows格式 set fileformat=dos
+      * unix格式 set fileformat=unix
+    * 添加标识线 set cul 取消 set nocul
+    * 获取帮助 set all
+    * 获取帮助 ：help|：help|vimtutor
+
+### 
