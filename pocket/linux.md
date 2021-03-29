@@ -1036,9 +1036,15 @@ $basearch 系统架构
 
 ## 查看系统信息
 
-* 查看cpu信息 lscpu
+查看cpu信息 lscpu
 
-## 磁盘
+### 主机名
+
+* 查询本机主机名 hostname
+* 设置主机名 houstname 新名称
+* 配置文件 /etc/hostname
+
+### 磁盘
 
 * 查看磁盘使用情况 df
   * 人类阅读方式 -h
@@ -1047,7 +1053,7 @@ $basearch 系统架构
   * 人类阅读方式 -h
 * 测试硬盘拷贝速率(读写能力) dd if=/dev/zero(白洞) of=被写入的目标文件 bs=5GB count=写入次数
 
-### raid卡
+#### raid卡
 
 * raid0
   ![raid0](./img/17.png "raid0")
@@ -1068,9 +1074,9 @@ $basearch 系统架构
 * raid6
   ![raid6](./img/23.png "raid6")
 
-## 网络
+### 网络
 
-### 网络基础知识
+#### 网络基础知识
 
 * 主机位全为0代表一个网段
 * 主机位全为1代表网段中的广播地址
@@ -1082,4 +1088,91 @@ $basearch 系统架构
 * B类网络
   * 网络位16位，主机位16位
   * ip为`128.0.0.0`-`191.255.255.255`
-  * 子网
+  * 子网掩码`255.255.0.0`
+  * 私有地址`172.16.0.0`-`172.31.255.255`
+* C类网络
+  * 网络位24位，主机位8位
+  * ip为`192.0.0.0`-`223.255.255.255`
+  * 子网掩码`255.255.255.0`
+  * 私有网络`192.168.0.0`-`192.168.255.255`
+* D类网络
+  * 不分网络位与主机位
+  * ip`224.0.0.0`-`239.255.255.255`
+  * 作为多播使用
+* E类网络
+  * 科研使用
+  * ip`240.0.0.0`-`255.255.255.255`
+
+#### ip配置
+
+* 查看 ip addr|a
+* 增加 ip a add ip/子网掩码 dev 网卡名称
+* 删除 ip a del ip/子网掩码 dev 网卡名称
+* 设置别名 ip a add ip/子网掩码 dev 网卡名称 label 新名称
+
+##### 配置网卡文件
+
+centos配置文件在/etc/syscnfig/netwok-scrips/ifcfg-name
+
+~~~shell
+
+TYPE="Ethernet"  # 网卡的接口类型
+PROXY_METHOD="none"
+BROWSER_ONLY="no"
+BOOTPROTO="dhcp" # 获取ip地址的方式，可以是dhcp,static,none
+DEFROUTE="yes"
+IPV4_FAILURE_FATAL="no"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+IPV6_DEFROUTE="yes"
+IPV6_FAILURE_FATAL="no"
+IPV6_ADDR_GEN_MODE="stable-privacy"
+NAME="ens33" # 网卡名称
+UUID="c252096f-57e0-41bd-a1d9-5158a86f9ba1" # 设备唯一标识码
+DEVICE="ens33" 
+ONBOOT="yes" #开机是否启动
+HWADDR="" #mac地址
+IPADDR=ip地址
+NTEMASK=子网掩码
+GATEWAY=网关
+~~~
+
+### dns配置
+
+配置文件在/etc/reslov.conf
+
+~~~shell
+nameserver 192.168.21.2
+~~~
+
+dns的解析顺序
+
+1. 本地解析:/etc/hosts
+2. dns服务器解析
+3. 根节点解析
+
+#### 查看网络状态
+
+* ss [options]
+* 所有 -a
+* 监听 -l
+* tcp -t
+* udp -u
+* unix socket文件 -x
+* 相关程序 -p
+* 服务端口 -n
+* 统计 -s
+  
+## 服务设置
+
+* systemctl [options] service
+* start name ... 启动服务
+* stop name ... 关闭服务
+* reload name  重读配置文件  平滑重启
+* restart name  重启服务
+* status name 查看状态
+* enable name 开机自启动
+* disabled name 关闭开机自启动
+* systemctl list-unit-files |grep sshd 查看服务是否开机自启动
+  
+## 定时任务
