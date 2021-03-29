@@ -73,6 +73,7 @@ bash是linux系统的用户界面，提供了用户与系统的交互，它接�
 * 设置别名 alias 别名="命令"
   * 设置别名只对当前终端有效
 * 取消设置的别名 unalias 别名
+* 查看命令的路径 which 命令
 
 如要设置永久别名 echo 'alias 别名="命令"' >> /etc/bashrc(对所用户有效)|~/.bashrc(对当前用户有效)
 
@@ -759,3 +760,326 @@ find [options] ... [查找路径][查找条件][处理动作]
 * 指定切割后名称的后缀为数字(默认abc来排序) -d
 * 指定后缀位数(默认3位) -a
 * 合并 cat 切割后文件 > 合并后文件
+
+## 用户
+
+* 超级管理员 root id 0
+* 普通用户
+  * 系统用户：用来启动系统的一些服务和进程的用户不可登陆 1-999（centos7） 1-499（centos6）
+  * 可登陆用户：能登陆的用户 1000-65535（centos7） 500-65535（centos6）
+
+### 添加用户
+
+* useradd [options] 用户名
+* 系统用户的id是递减的，普通用户的id是递增的
+* 指定用户的家目录 -d `useradd -d /home/aaa bb`
+* 指定用户组的id -g 用户组id
+* 指定附加用户组 -G 用户组名称
+* 指定初始化家目录内的内容,配合创建家目录-m使用 -k 路径
+* 创建家目录 -m
+* 指定用户的表述信息 -c ‘描述信息’
+* 不自动创建同名用户组 -N
+* 指定用户登陆后使用的shell -s shell路径
+* 指定用户id -u 用户id
+* 显示系统默认配置 -D
+* 修改系统默认配置 -D [options]
+* 创建用户的默认文件 /etc/default/useradd
+* 默认创建家目录时复制的路径 /etc/skel/*
+
+### 修改用户
+
+* usermod [options] 用户名
+* 修改用户的描述信息 -c
+* 修改用户的家目录，默认不会新建目录，如果需要移动家目录，则需要配合 -m是使用 -d
+* 修改用户组 -g 用户组|用户组id
+* 重新指定用户附加组 -G 用户组
+* 追加附加组 -a
+* 修改用户名 -l 新的用户名
+* 锁定用户，不可以登陆，修改密码就可解锁 -L
+* 解锁用户 -U
+* 修改登陆后的shell -s
+* 修改用户的uid -u
+* 修改用户的过期时间 -e 年-月-日
+
+### 删除用户
+
+* userdel [options] 用户名
+* 同时删除家目录 -r
+* 强制删除 -R
+* 默认情况下，用户在登陆状态下是不能删除用户的，强制删除用户后，用户还是可以继续使用的
+
+### 查看用户
+
+* id [options] 用户名
+* 只显示组id -g
+* 只显示附加组 -G
+* 只显示用户id -u
+* 只显名称可以配合g|u|G配合只用 -n
+  
+### 切换用户
+
+* su [option] [-] 用户名
+* 完整切换：环境变量等都会发生改变 `su - 用户名`
+* 不完整切换：不会切换用户的环境变量家目录 `su 用户名`
+* root切换普通用户不需要密码
+* 在普通用户下执行某些需要root权限的命令 sudo 命令
+* sudo配置文件为/etc/sudoers
+  * 如下修改使执行sudo命令不再需要输入密码
+    ![sudo配置](./img/13.png "sudo配置")
+
+### passwd 文件
+
+/etc/passwd
+![passwd配置文件](./img/14.png "passwd配置文件")
+
+* passwd文件记录了用户记录
+* 用户名：密码占位符：uid:gid:描述信息：家目录：登陆后使用的shell
+
+### 设置密码
+
+* passwd [option] 用户名
+* 删除指定用户的密码，删除之后就不可以的了登陆了 -d
+* 锁定用户 -l
+* 解锁用户 -u
+* 在下次登陆时强制用户修改密码 -e
+* 强制 -f
+* 密码的最长使用天数（超过有效期需要修改） -x #
+* 密码的最短使用天数(要超过该时间才可再次修改密码) -n #
+* 密码距离过期还有多少天提示 -w #
+* 密码过期多少天禁用 -i
+* 从标准输出读取 --stdin `echo "456"|passwd --stdin aaa`
+  
+### shadow 存放文件
+
+shadow记载了用户与密码/etc/shadow
+
+![shadow](./img/15.png "shadow")
+
+用户：$加密方式$盐$加密后的字符$：距离1970年1月1日最后一次修改密码时间：密码最短时有时间（0表示随时可以修改）：密码最长使用时间（99999表示永久）：密码过期提醒时间（默认7）：密码锁定时间：密码失效时间（据1970年1月1日）
+
+### 密码策略
+
+* 必须包含数字、大小写字母、特殊字符
+* 12位以上
+* 不能是弱口令
+* 必须是随机密码
+* 3个月或者半年修改一次
+
+### 修改用户密码策略
+
+* chage [options] 用户
+
+### chfn
+
+* 修改用户个人信息（房间号、手机号等）
+* chfn
+
+## 用户组
+
+* 超级用户组 root 0
+* 普通用户组
+  * 系统用户组 1-999（centos7） 1-499（centos6）
+  
+### 添加用户组
+
+* groupadd
+* 指定id -g
+* 创建系统用户组 -r
+
+### 组文件
+
+/etc/group
+
+![组文件](./img/16.png "组文件")
+
+组名：密码：gid：组成员
+
+/etc/gshadow
+
+组名：密码：组管理员密码：组成员
+
+### 修改组信息
+
+* groupmod [options] 组名称
+* 修改组id -g
+* 修改组名 -n
+
+### 删除组
+
+* groupdel 组名
+
+## 软件
+
+.rpm ：redhat package manager （redhat、centos）
+.deb：Debian软件包（debian、ubuntu）
+
+### 包的命名
+
+MySQL-python-1.2.5-1.el7.x86_64.rpm
+名称-版本(大版本，小版本，修订版)-打包版本.可用系统.rpm|deb
+
+#### 包的来源
+
+1. 光驱镜像
+2. 第三方网站
+3. 官方网站
+4. http：//pkgs.org
+5. epel 第三方包的结合地
+
+### rpm
+
+* 查询是否安装包 rpm -q 包名称
+  * 全部 -a
+  * 查看指定文件由那个文件安装 -f
+  * 查看指定的包生成那些配置文件 -c
+  * 查看指定的包生成那些文档 -d
+  * 查询指定包的详细信息 -i
+  * 查询指定的包生成的文件 -l
+* 通过.rpm文件安装 rpm -i rpm文件
+* 显示指令执行过程 -v
+
+### yum
+
+yum会自动解决依赖关系
+仓库：存放的是多个包和包的元数据信息
+
+仓库的位置：
+
+* http：//
+* https：//
+* ftp：//
+* file：//(本地文件)
+
+配置文件 /etc/yum.repos.d
+
+#### yum配置文件
+
+~~~shell
+[base] #名称
+name=CentOS-$releasever - Base - mirrors.aliyun.com # 描述信息
+failovermethod=priority # 定义挑选顺序 priority 按顺序 roundrobin 随机
+baseurl=http://mirrors.aliyun.com/centos/$releasever/os/$basearch/
+        http://mirrors.aliyuncs.com/centos/$releasever/os/$basearch/
+        http://mirrors.cloud.aliyuncs.com/centos/$releasever/os/$basearch/
+enabled ={0|1} 是否启用，1启用，0是不启用
+gpgcheck={0|1} 使用校验
+gpgkey=http://mirrors.aliyun.com/centos/RPM-GPG-KEY-CentOS-7 # 校验文件
+默认值
+$releasever 发行版
+$basearch 系统架构
+~~~
+
+可以使用阿里、163、sohu、腾讯等源
+
+#### yum命令
+
+* 查看仓库信息 yum repolist
+* 列出仓库里面所有的包，以安装的包前面带@ yum list
+* 安装包 yum install
+* 安装本地安装包 yum -y install 安装包.rpm
+* 重新安装 yum reinstall
+* 更新所有的包 yum update
+* 更新指定包 yum update 指定包
+* 降级 yum downgrade
+* 检查包是否可以更新 yum check-update
+* 卸载包 yum remove
+* 显示包的详细信息 yum info 包
+* 删除元数据信息（服务器上软件信息本地缓存） yum clean all
+* 重新构建元数据信息 yum makecacche
+* 搜索软件包（包含名称与描述信息） yum search
+* 搜索命令是由那个包提供的 yum provides
+* 静默模式 -q
+* 自动确认 -y
+
+#### 软件包组
+
+* 查看包组 yum grouplist
+* 安装包组 yum groupinstall
+* 获取包组信息，查看包组由那些包组成 yum groupinfo
+* 更新 yum groupupdate
+* 卸载包组 yum groupremove
+
+### dpkg
+
+* 安装本地文件 dpkg -i 安装包.deb
+* 删除安装包 dpkg -r 安装包名
+* 删除安装包同时删除其配置文件 dpkg -P 安装包名
+* 显示于安装包关联的文件 dpkg -L 安装包
+* 显示以安装的软件包列表 dpkg -l
+* 显示包内的文件列表
+
+### apt
+
+* 软件源配置文件`/etc/apt/sources.list`
+* 重新获取软件列表 apt update
+* 更新软件(后面不带软件名则更新全部) apt upgrade 软件名
+* 在升级软时自动处理依赖关系 aptfull-upgrade
+* 安装新包 apt install 软件名
+* 安装新包时自动安装依赖 apt -f install 软件包
+* 删除包 apt remove 软件名
+* 删除包即配置文件 apt purge 软件包
+* 自动删除不需要的包 apt autoremove
+* 列出包含条件的包 apt list
+* 编辑源列表 apt edit-sources
+
+### 源码安装
+
+* 下载 wget 下载路径
+* 解压 tar xf 压缩包
+* 切换目录 cd 解压文件
+* 查看相关帮助文件 cat README|INSTALL
+* 安装所属需文件
+* 编译(检查程序所需文件) ./configure
+* 构建安装程序 make
+* 安装程序 make install
+* 配置环境变量
+
+## 查看系统信息
+
+* 查看cpu信息 lscpu
+
+## 磁盘
+
+* 查看磁盘使用情况 df
+  * 人类阅读方式 -h
+* 查看文件或目录大小 du
+  * 查看目录 -s
+  * 人类阅读方式 -h
+* 测试硬盘拷贝速率(读写能力) dd if=/dev/zero(白洞) of=被写入的目标文件 bs=5GB count=写入次数
+
+### raid卡
+
+* raid0
+  ![raid0](./img/17.png "raid0")
+  * 都使用，和正常的硬盘使用一样
+* raid1
+  ![raid1](./img/18.png "raid1")
+  * 一主一备
+* raid2
+  ![raid2](./img/19.png "")
+  * 基本不用
+* raid3
+  ![raid3](./img/20.png "raid3")
+  * 可以丢失一块数据，使用校验数据恢复缺失数据
+* raid4
+  ![raid4](./img/21.png "raid4")
+* raid5
+  ![raid5](./img/22.png "raid5")
+* raid6
+  ![raid6](./img/23.png "raid6")
+
+## 网络
+
+### 网络基础知识
+
+* 主机位全为0代表一个网段
+* 主机位全为1代表网段中的广播地址
+* A类网络
+  * 网络位8位，主机位24位
+  * ip为`1.0.0.0`-`126.255.255.255`
+  * 子网掩码`255.0.0.0`
+  * `127.0.0.0`-`127.255.255.255`回环地址，指向自己的ip
+* B类网络
+  * 网络位16位，主机位16位
+  * ip为`128.0.0.0`-`191.255.255.255`
+  * 子网
