@@ -4,12 +4,75 @@
 
 ## 安装myqsl
 
+ubuntu
+
 ~~~SHELL
 sudo apt-get install mysql-server
 sudo apt-get install mysql-client
 ~~~
 
 可以在/etc/mysql/debian.cnf中查看默认账户密码
+
+centos
+
+下载
+
+~~~shell
+
+wget http://mirrors.sohu.com/mysql/MySQL-5.7/mysql-5.7.27-1.el7.x86_64.rpm-bundle.tar
+~~~
+
+解压
+
+~~~shell
+tar xf MySQL-5.6.44-1.el7.x86_64.rpm-bundle.tar
+~~~
+
+安装
+
+~~~shell
+yum install -y *.rpm
+~~~
+
+默认安装位置：/var/lib/mysql
+
+报错信息：
+
+~~~sehll
+2019-08-30T11:18:22.976635Z 0 [Warning] Can't create test file /mydata/mysql/localhost.lower-test
+2019-08-30T11:18:22.976687Z 0 [Note] /usr/sbin/mysqld (mysqld 5.7.27) starting as process 2788 ...
+2019-08-30T11:18:22.980289Z 0 [Warning] Can't create test file /mydata/mysql/localhost.lower-test
+2019-08-30T11:18:22.980338Z 0 [Warning] Can't create test file /mydata/mysql/localhost.lower-test
+
+原因：selinux开启
+解决办法：setenforce 0
+~~~
+
+重置密码
+
+~~~shell
+默认密码：
+grep 'pass' /var/log/mysqld.log
+mysql_secure_installation
+输入root密码
+是否要修改密码
+是否要修改root密码（大小写、数字、特殊字符）
+是否要删除匿名用户
+是否禁止root远程登录
+是否要删除test数据库
+是否要刷新表的权限
+~~~
+
+密码校验规则
+
+~~~shell
+设置密码的校验规则
+mysql> set global validate_password_policy=0;
+0 校验级别最低，只校验密码的长度，长度可以设定
+1 必须包括大写字母、小写字母、数字、特殊字符
+2 必须满足上面两条，并追加，对于密码中任意连续的4个（或者4个以上） 字符不能是字典中的单词
+mysql> set global validate_password_length=3; 修改密码的最短长度
+~~~
 
 ### myql的一般操作
 
@@ -371,3 +434,63 @@ source [sql文件路径]
 ~~~
 
 在sql下并切换到要还原的库下
+
+## 数据库主从
+
+设置配置文件中
+主机
+
+~~~shell
+server-id=1 设置id
+log-bin=/mydata/log/master-bin 启动binlog日志
+sync_binlog = 1 确保主从复制事务安全
+~~~
+
+备机
+
+~~~shell
+server-id =12 id不可一致
+relay_log =/mydata/log/slave-log
+sync_binlog = 1
+read-only=ON
+~~~
+
+主机执行
+
+~~~SQL
+mysql> grant replication slave on *.* to 'slave'@'192.168.21.131' identified by '1234'; #配置一个远程登录用户
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+mysql> flush privileges; #重新读取用户配置
+Query OK, 0 rows affected (0.01 sec)
+mysql> show master status\G #查看binlog日志内容
+~~~
+
+备机执行
+
+~~~SQL
+
+CHANGE MASTER TO
+  MASTER_HOST='master2.example.com',
+  MASTER_USER='replication',
+  MASTER_PASSWORD='password',
+  MASTER_PORT=3306,
+  MASTER_LOG_FILE='master2-bin.001',
+  MASTER_LOG_POS=4,
+  MASTER_CONNECT_RETRY=10; #监控主服务器的时间
+ 连接主库
+change master to master_host='192.168.21.128',master_user='slave',master_password='1234';
+ 启动进程
+start slave；
+ 查看状态
+show slave status\G
+~~~
+
+确认设置完成
+
+~~~sql
+在备机上执行
+show slave status\G
+存在
+slave_io_running:yes
+slave_sql_running:ye
+~~~
