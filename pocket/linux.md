@@ -1176,3 +1176,175 @@ dns的解析顺序
 * systemctl list-unit-files |grep sshd 查看服务是否开机自启动
   
 ## 定时任务
+
+/etc/crontab
+![定时任务](./img/25.png "定时任务")
+
+~~~shell
+
+22 * * * * *  root touch b.txt 每天的每小时的第22分钟做什么事
+25 15 * * * root touch /tmp/c.txt 每天下午的三点25分
+27 15,16,17 * * * root touch /tmp/d.txt  每天的15点，16点，17点的第27分钟
+28 15-19 * * * root touch /tmp/e.txt 表示 每天的15点到19点的28分钟
+30 10-20/5 * * * root touch /tmp/f.txt 每天的10点到20点每个5小时
+*/7 * * * * root touch /tmp/f.txt  从0开始重新结算
+37 * 10,20,30 * 4 echo $(date) >> /tmp/g.txt 表示每个月的10,20,30或者每周的周四
+建议：
+分钟不要写成*
+分钟不要写成*
+分钟不要写成*
+~~~
+
+定时任务的作用：
+
+* 定时删除
+* 定时备份
+* 定时时间同步 ntp
+
+计划任务执行日志：
+
+1. `/var/log/cron`(chentos)
+2. 删除`/etc/rsyslog.d/50-default.conf`中`#cron.*  /var/log/cron.log`前的`#`然后重启rsyslog服务（ubuntu）
+
+## 进程
+
+### 查看进程
+
+* ps [options]
+* 所有终端 a
+* 包括不连接终端的终端 x
+* 显示进程详细信息 u
+* 显示进程树 f
+* 指定排序方式，默认是递增。如需递减着在字段上加- k字段
+* 指定显示的属性字段，不可以与u同时使用 o
+* 获取可以显示的所有字段 L
+* 显示所有线程 -L
+* 相当与ax -e
+* 相当与u -f
+* 显示更详细信息 -F
+* 相当于f -H
+* 显示指定用户信息 -U 用户名
+
+![进程](./img/26.png "进程")
+
+ps输出说明：
+
+* vsz：虚拟内存(程序认为可以获取的内存)
+* rss：实际内存
+* psr：cpu编号
+* stat:状态
+* %cup：cpu占用率
+* %mem：内存占用率
+
+## 根据进程名称查询pid
+
+* pidof 进程名
+
+## 系统工具
+
+### 显示设备运行时长
+
+* uptime
+![uptime](./img/27.png "uptime")
+当前时间  当前运行时长  当前在线用户数量  cup负载：1分钟，5分钟，15分钟（不超过2倍核心数认为良好）
+
+### 首部信息
+
+* top
+* 显示uptime信息 l
+* 切换进程(总数，运行，睡眠数，停止数，僵尸进程数)cpu(us:用户空间,sy:系统空间,ni:nice值,id:空闲,wa:等待,hi:硬中断,si:软中断,st:虚拟机偷走时间)使用率显示 t
+
+* 内存显示切换 m
+* 展开cup显示 1
+* 排序
+  * 按照cpu占用率排序 P
+  * 按照内存使用率排序 M
+  * 按照cup的占用率排序 T
+* 退出 q
+* 修改刷新频率，默认3秒 s
+* 杀死一个进程，默认第一个进程 k
+* 保存到文件 w
+* 选项
+  * 设置刷新时间 -d 刷新时间
+  * 显示所有的信息 -b
+  * 显示刷新#次 -n #
+* htop与top是一样的不过需要安装，也更直观
+
+## 性能分析
+
+* free
+  * 人类阅读 -h
+* vmstat 刷新频率 刷新次数
+  * procs：进程
+    * r：正在运行的进程数
+    * b：阻塞队列的长度
+  * memory：内存
+    * swap：虚拟内存大小
+    * free：空闲物理内存大小
+    * buff：用于buff内存大小
+    * cache：用户cache内存大小
+  * swap：虚拟内存
+    * si：从磁盘交换到内存的数据速率（kb/s）
+    * so： 从内存交换到磁盘的数据速率（kb/s）
+  * io
+    * bi：从磁盘读取到系统的速率（kb/s）
+    * bo：从系统写入到磁盘的速率（kb/s）
+  * system：系统
+    * in：中断频率
+    * cs：进程之前切换的频率
+* iostat 刷新频率 刷新次数（插卡磁盘读写速率）
+* dstat
+  * cup -c
+  * 硬盘 -d
+  * 内存 -m
+  * 网络 -n
+  * 进程 -p
+  * io请求 -r
+  * swap -s
+  * tcp信息 --tcp
+  * udp信息 --udp
+  * 显示最多的进程 --top-cup|-io|-mem
+* iftop (显示网卡的流量,需要使用管理员权限)
+
+## 进程管理
+
+* kill [options] 进程pid
+* 查询信号 -l
+* 不需要关闭程序，重新加载配置文件 -1
+* 终止进程，相当于ctrl+c -2
+* 强制杀死进程 -9
+* 终止正在运行的进程 -15
+* 继续运行 -18
+* 后台休眠 -19
+* 按照pid:kill-n pid
+* 按照名称：killall -n name
+* 按照名称：pkill -n name
+  
+## 作业管理
+
+* 前台作业：一直占用终端的作业
+* 后台作业：不占用当前终端
+* 让作业运营在后台
+  * ctrl+z
+  * command &
+* 脱离终端
+  * nohup command &>/dev/null & 将输出打印到文件中
+  * screen 执行后回车然后执行命令，关闭终端命令进程不关闭
+    * 显示所有screen窗口 -list
+    * 进出screen窗口 -r 窗口编号（在list里查看）
+
+## 安全
+
+### 防火墙
+
+* iptables -L 查看 防火墙策略
+* iptables -F 清空 防火墙
+* systemctl disable firewalld 开机并启动
+* systemctl stop firewalled
+
+### selinux
+
+* 配置文件 /etc/selinux/config
+* SELINUX=disabled
+* setenforce 0 临时生效
+* getenforce 查看selinux的状态
