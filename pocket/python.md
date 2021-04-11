@@ -76,10 +76,10 @@ pip install -r requirement.txt -i https://pypi.douban.com/simple
 pip3 install virtualenvwrapper -i https://pypi.douban.com/simple
 2.修改文件
 vim ~/.bashrc
-export WORKON_HOME=/envdir  
+export WORKON_HOME=/envdir  #虚拟环境目录
 export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'   
-export VIRTUALENVWRAPPER_PYTHON=/opt/python36/bin/python3      
-source /opt/python36/bin/virtualenvwrapper.sh 
+export VIRTUALENVWRAPPER_PYTHON=/opt/python36/bin/python3      #python3路径
+source /opt/python36/bin/virtualenvwrapper.sh #virtualenvwrapper路径
 3. 加载~/.bashrc
 source ~/.bashrc
 4.创建环境
