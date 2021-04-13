@@ -415,7 +415,12 @@ select * from 表1 where 字段1 in (selct 字段2 from 表2  where 条件);
 
 ### 备份
 
-~~~SQ;
+* 锁表
+* 备份慢
+* 不可以做增量备份
+* 单线程
+
+~~~SQl
 mysqldump -u用户名 -p 数据库名称 >路径.sql      #备份数据库下的所有表
 mysqldump -u用户名 -p 数据库名称  数据表>路径.sql       #备份单个表
 mysqldump -u用户名 -p databases 数据库名称  数据表>路径.sql     #备份整个数据库
@@ -434,6 +439,82 @@ source [sql文件路径]
 ~~~
 
 在sql下并切换到要还原的库下
+
+### xtrabackup
+
+* 多进程
+* 支持增量备份
+* 锁行
+  
+#### 安装
+
+~~~shell
+
+yum install https://repo.percona.com/yum/percona-release-latest.noarch.rpm #安装yum仓库
+
+yum install percona-xtrabackup-24 #安装
+~~~
+
+#### 数据库创建用户
+
+~~~SQL
+
+mysql> create user 'backup'@'localhost' identified by 'backup';
+Query OK, 0 rows affected (0.00 sec) 
+创建用户
+
+mysql> grant reload,lock tables,process,replication client on *.* to 'backup'@'localhost';
+Query OK, 0 rows affected (0.00 sec)
+设置用户重载、锁表、查看全部用户线程/连接、备份客户端权限
+
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+刷新用户配置
+~~~
+
+#### 全备份
+
+~~~shell
+
+xtrabackup --backup   --target-dir=备份的目录 -u用户名 -p密码 --socket=MySQL中的sock文件
+~~~
+
+##### 还原
+
+~~~shell
+
+准本文件
+xtrabackup --prepare --target-dir=备份的目录
+
+恢复部分文件
+cd 备份的目录
+cp -rf 需要复制的内容 MySQL路径
+chown mysql.mysql 拷贝后的文件 -R
+
+恢复全部文件
+xtrabackup --copy-back --target-dir=备份路径
+cd mysql路径
+chown mysql.mysql * -R
+~~~
+
+#### 增量备份
+
+~~~shell
+
+xtrabackup --backup --target-dit=增量备份路径 --incremental-basedir=之前一次备份路径 -u用户名 -p密码 --socket=mysql的sock文件
+~~~
+
+#### 还原(要全部删除后才可以使用)
+
+~~~shell
+xtrabackup --prepare --apply-log-only --target-dir=全备份路径
+xtrabackup --prepare --apply-log-only --target-dir=全备份路径 --incremental-dir=增量备份路径
+xtrabackup --prepare --apply-log-only --target-dir=上一次全备份路径 --incremental-dir=新一次全备份路径
+xtrabackup --copy-back --target-dir=全备份路径
+cd mysql的路径
+chown mysql.mysql * -R
+systemctl restart mysqld
+~~~
 
 ## 数据库主从
 
