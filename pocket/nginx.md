@@ -434,23 +434,18 @@ uwsgi --http ：端口 --modile django.wsgi
 ~~~shell
 
 [uwsgi]
-http = :8080
-#项目路径
-chdir= /data/mysite
-# uwsgi的文件
-wsgi-file= mysite/wsgi.py
-# 虚拟环境
-# virtualenv = /root/env
-# 进程个数
-processes = 2
-# 线程个数
-threads=2
-# 后台启动，指定日志的输出
-daemonize=/data/mysite/django.log
-# 清除临时文件
-vacuum = true
-# python文件发生改变自动重启
-py-autoreload=1
+http = :8080    #指定端口号
+
+chdir= /data/mysite #项目路径
+
+wsgi-file= mysite/wsgi.py # uwsgi的文件
+// 虚拟环境
+// virtualenv = /root/env    # 进程个数
+processes = 2   # 线程个数
+threads=2   #进程个数
+daemonize=/data/mysite/django.log   # 后台启动，指定日志的输出
+vacuum = true   # 关闭清除临时文件
+py-autoreload=1 # python文件发生改变自动重启
 ~~~
 
 ~~~shell
