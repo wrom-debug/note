@@ -16,6 +16,16 @@ yum install gcc zlib2-devel pcre-devel openssl-devel
 yum install nginx
 ~~~
 
+## 启动
+
+~~~shell
+
+systemctl start nginx   #启动nginx 
+nginx -t    #检查conf配置是否正确
+systemctl stop nginx    #停止nginx
+systemctl restart nginx #重启nginx
+~~~
+
 ## 目录结构
 
 * conf 配置文件
@@ -217,6 +227,14 @@ allow 192.168.0.2； #允许这个ip访问
 deny 192.168.0.0/24;    #禁止这个网段访问(小范围写在大范围前)
 ~~~
 
+### 压缩
+
+~~~shell
+
+gzip on；
+提高响应速度，节省带宽
+~~~
+
 ### 反向代理
 
 工作流
@@ -381,4 +399,136 @@ server  {
         location ~*\.(jpg|gif|png)$ {
         root /data/img;
         }
+~~~
+
+#### status
+
+~~~shell
+
+location /status{
+    stub_status on;
+}
+~~~
+
+### WSGI
+
+uwsgi：协议
+uWSGI:连接服务器与应用的web中间件
+
+#### 安装uwsgi
+
+~~~shell
+
+pip3 install uwsgi 
+~~~
+
+#### 启动wsgi
+
+~~~shell
+
+uwsgi --http ：端口 --modile django.wsgi
+~~~
+
+#### 配置文件
+
+~~~shell
+
+[uwsgi]
+http = :8080
+#项目路径
+chdir= /data/mysite
+# uwsgi的文件
+wsgi-file= mysite/wsgi.py
+# 虚拟环境
+# virtualenv = /root/env
+# 进程个数
+processes = 2
+# 线程个数
+threads=2
+# 后台启动，指定日志的输出
+daemonize=/data/mysite/django.log
+# 清除临时文件
+vacuum = true
+# python文件发生改变自动重启
+py-autoreload=1
+~~~
+
+~~~shell
+
+uwsgi --ini file 
+~~~
+
+#### nginx配置文件
+
+~~~shell
+
+server {
+listen 80;
+server_name crm.oldboy.com;
+location / {
+proxy_pass http://127.0.0.1:8080; #通用的方式
+}
+location /static {
+root /data/supercrm;
+}
+}
+~~~
+
+在django的配置中要写入
+
+~~~shell
+
+SATAIC_ROOT=os.path.join(BASE_DIR,'static/')
+~~~
+
+执行命令
+
+~~~shell
+
+python3 manager.py collectstatic #用来收集静态文件
+~~~
+
+#### nginx第二种配置
+
+~~~shell
+
+uwsgi 配置：
+socket= :9090
+
+nginx的配置文件：
+location / {
+include uwsgi_params;
+uwsgi_pass 127.0.0.1:9090;  #只有python django才可以使用
+}
+
+uwsgi指定9090端口，nginx就将请求指向对应ip的9090端口，指向本机速率快。
+~~~
+
+#### nginx第三种配置
+
+~~~shell
+
+uwsgi 配置：
+socket = file.sock
+
+nginx的配置文件：
+location /{
+include uwsgi_params;
+uwsgi_pass unix://file.sock
+}
+
+uwsgi指向新建sock文件，nginx也指向该新建文件，不会消耗端口，但是uwsgi与nginx要是同一台服务器。
+~~~
+
+### 正常项目流程图
+
+~~~mermaid
+
+graph LR
+    A[客户端] --> |请求|B["nginx"]
+    B --> |请求|C[uwsgi]
+    C --> |请求|D[django]
+    D --> |响应|C
+    C --> |响应|B
+    B --> |响应|A
 ~~~
