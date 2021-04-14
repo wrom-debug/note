@@ -408,6 +408,7 @@ server  {
 location /status{
     stub_status on;
 }
+查看nginx状态
 ~~~
 
 ### WSGI
