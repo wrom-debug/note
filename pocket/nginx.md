@@ -430,7 +430,7 @@ pip3 install uwsgi
 uwsgi --http ：端口 --modile django.wsgi
 ~~~
 
-#### 配置文件
+#### uwsgi配置文件
 
 ~~~shell
 
