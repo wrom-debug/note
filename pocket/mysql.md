@@ -460,7 +460,7 @@ yum install percona-xtrabackup-24 #安装
 ~~~SQL
 
 mysql> create user 'backup'@'localhost' identified by 'backup';
-Query OK, 0 rows affected (0.00 sec) 
+Query OK, 0 rows affected (0.00 sec)
 创建用户
 
 mysql> grant reload,lock tables,process,replication client on *.* to 'backup'@'localhost';
