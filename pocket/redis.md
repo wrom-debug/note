@@ -362,3 +362,152 @@ appendonly yes
 appendfilename "appendonly.aof"
 appendfsync everysec  #储存间隔每秒
 ~~~
+
+### 使用命令从rdb切换到aof
+
+~~~shell
+
+config set appendonly yes
+config set save ""
+~~~
+
+## redis事务
+
+~~~shell
+
+multi #开启事务
+事务所执行的语句
+exec #执行事务，没有回滚机制，不是原子性
+~~~
+
+## redis集群
+
+需要6台redis服务器，3主3备，存储的key会依据hash存放到3台主的其中一台
+
+~~~shell
+
+## 6380
+bind 127.0.0.1
+port 6380
+daemonize yes
+pidfile 6380.pid
+logfile 6380.log
+cluster-enabled yes
+cluster-config-file node-6380.conf
+cluster-node-timeout 10000
+## 6381
+bind 127.0.0.1
+port 6381
+daemonize yes
+pidfile 6381.pid
+logfile 6381.log
+cluster-enabled yes
+cluster-config-file node-6381.conf
+cluster-node-timeout 10000
+## 6382
+bind 127.0.0.1
+port 6382
+daemonize yes
+pidfile 6382.pid
+logfile 6382.log
+cluster-enabled yes
+cluster-config-file node-6382.conf
+cluster-node-timeout 10000
+## 6383
+bind 127.0.0.1
+port 6383
+daemonize yes
+pidfile 6383.pid
+logfile 6383.log
+cluster-enabled yes
+cluster-config-file node-6383.conf
+cluster-node-timeout 10000
+## 6384
+bind 127.0.0.1
+port 6384
+daemonize yes
+pidfile 6384.pid
+logfile 6384.log
+cluster-enabled yes
+cluster-config-file node-6384.conf
+cluster-node-timeout 10000
+## 6385
+bind 127.0.0.1
+port 6385
+daemonize yes
+pidfile 6385.pid
+logfile 6385.log
+cluster-enabled yes
+cluster-config-file node-6385.conf
+cluster-node-timeout 10000
+~~~
+
+6台服务器的配置都只是开启cluster，设置超时时间，配置conf文件
+
+### 安装ruby
+
+使用cluster需要安装ruby2.2版本以上
+
+~~~shell
+
+wget https://cache.ruby-lang.org/pub/ruby/2.6/ruby-2.6.4.tar.gz
+tar ruby-2.6.4.tar.gz
+cd ruby-2.6.4
+./configure --prefix=/opt/ruby
+make && make install
+配置环境变量
+PATH=/opt/ruby/bin:$PATH
+source 
+~~~
+
+#### 安装ruby的依赖库
+
+~~~shell
+
+gem install redis
+~~~
+
+### 安装集群
+
+~~~shell
+
+redis-cli --cluster create --cluster-replicas 1(每台服务器有几台备的服务器) 服务器地址1 服务器地址2 服务器地址3 服务器地址4 服务器地址5 服务器地址6
+
+create 创建集群
+check 检查集群
+info 查看集群
+fix 修复集群
+~~~
+
+### 链接集群
+
+~~~shell
+
+redis-cli -c 服务器地址
+~~~
+
+## python链接
+
+普通链接
+
+~~~python
+
+import redis  #导入redis库
+r=redis.StrictRedis(host='192.168.21.128',port=6380,decode_responses=True)  #初始链接
+r.set("haoeya","kuaixiake") #设置值
+print(r.keys()) #获取所有key
+
+ #语法与redis一致
+~~~
+
+集群链接
+
+~~~python
+
+import rediscluster #导入redis-py-cluster库
+nodes=[{"host":"192.168.21.128","port":6380},{"host":"192.168.21.128","port":6381},{"host":"192.168.21.128","port":6382},{"host":"192.168.21.128","port":6383},{"host":"192.168.21.128","port":6384},{"host":"192.168.21.138","port":6385}] 
+
+c=rediscluster.RedisCluster(startup_nodes=nodes,decode_responses=True)  #初始链接
+print(c.get('name'))
+ #语法与redis一致
+~~~
