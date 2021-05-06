@@ -1161,7 +1161,19 @@ dns的解析顺序
 * 相关程序 `-p`
 * 服务端口 `-n`
 * 统计 `-s`
-  
+
+### 文件网络传输
+
+1. 需要对端与本机都安装ssh服务
+2. scp 原文件路径 ip:目标文件路径
+
+### 服务器压力测试
+
+1. 需要执行`sudo apt install apache2-utils`安装对应软件
+2. `ab [options] [http[s]://]hostname[:port]/path`
+3. `-n 数值` 发起多少请求
+4. `-c 数值` 同时发起多少请求
+
 ## 服务设置
 
 * `systemctl [options] service`
