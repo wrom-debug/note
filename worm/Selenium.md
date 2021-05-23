@@ -245,3 +245,37 @@ except NoSuchElementException:
 finally:
     chrome.close()
 ~~~
+
+### chrome无头浏览器
+
+~~~python
+
+#使用谷歌无头浏览器
+from selenium import webdriver
+from time import sleep
+from selenium.webdriver.chrome.options import Options
+
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-gpu')
+
+driver = webdriver.Chrome(r'chromedriver.exe',chrome_options=chrome_options)
+driver.get('https://www.cnblogs.com/')
+print(driver.page_source)
+~~~
+
+### 免疫js判断selenium
+
+~~~python
+
+#如何规避selenium被检测
+from selenium import webdriver
+from selenium.webdriver import ChromeOptions
+from time import sleep
+
+option = ChromeOptions()
+option.add_experimental_option('excludeSwitches', ['enable-automation'])
+
+driver = webdriver.Chrome(r'chromedriver.exe',options=option)
+driver.get('https://www.taobao.com/')
+~~~
