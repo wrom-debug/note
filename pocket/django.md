@@ -139,9 +139,11 @@ wsgi.py --- runserver命令就是使用wsgiref模块做简单的web server，所
    在项目路径下创建一个文件夹存放模板文件，并在setting.py文件中添加`'DIRS': [os.path.join(BASE_DIR, '文件夹名称')]]`
 
    ![添加模板路径](img/9.png '添加模板文件夹路径')
+6. 允许其他设备访问主机
+   在配置文件中修改`ALLOWED_HOSTS = []`为`ALLOWED_HOSTS = ['*',]`
 
-6. 运行项目
-   切换目录到项目路径下执行`python manage.py runserver 127.0.0.1:8080`
+7. 运行项目
+   切换目录到项目路径下执行`python manage.py runserver 0.0.0.0:8080`
 
 ## RUL
 
