@@ -187,7 +187,7 @@ def home(request,year,moth):
 ~~~python
 
 url.py
-url(r'^home/(?p<year>\d{4})/(?p<moth>\d{2})',views.home)
+url(r'^home/(?P<year>\d{4})/(?P<moth>\d{2})',views.home)
 
 views.py
 def home(request,moth,year):
