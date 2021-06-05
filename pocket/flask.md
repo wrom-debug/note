@@ -152,6 +152,18 @@ app.config.from_object("settings.FlaskSetting")
 |request.url_root|与path一样|
 |request.method|获取请求方式|
 
+### session
+
+~~~python
+
+ #先配置好sessionkey秘钥并导入
+@app.routr("/")
+def home(): 
+    session[k]=v    #设置session值
+    return '登录成功'
+session[k] #获取session值
+~~~
+
 ### 路由与视图函数
 
 #### FBV
@@ -196,7 +208,15 @@ def admin_log():
 
 ~~~python
 
+class Login(views.MethodView):
+   
+def get(self):
+    return "login"
 
+def post(self):
+    return "post_login"
+
+app.add_url_rule("/login",view_func=Login.as_view(name="login"))    #给视图类绑定路由
 ~~~
 
 ### 蓝图
@@ -220,7 +240,7 @@ import 蓝图
 app.register_blueprint(蓝图.bp) #需要想提前导入蓝图文件
 ~~~
 
-### 项目结构
+#### 项目结构
 
 中、小型项目
 
@@ -259,3 +279,33 @@ app.register_blueprint(蓝图.bp) #需要想提前导入蓝图文件
 │       └── views.py
 └── manage.py  #运行flask实例，并导入配置
 ~~~
+
+### 中间件 特殊装饰器
+
+- `@app.before_request` :在请求进入视图函数之前
+- `@qpp.after_request`  :在视图返回响应到客户端之前
+- `@app.errorhandler(错误码)`   :重定义错误
+
+~~~python
+
+@app.before_request
+def before():
+    print('bf1')
+
+@app.after_request
+def after(response):    #必须要接受response参数
+    print('af1')
+    return response #必须返回response
+
+@app.errohandler(404)
+def error404(error):    #必须要接受error参数
+    print('error')
+~~~
+
+before_request返回值为None时的流程:
+
+![正常流程](./img/29.png "正常流程")
+
+before_request有返回值时的流程:
+
+![异常流程](./img/30.png "异常流程")
