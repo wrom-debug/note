@@ -136,6 +136,8 @@ app.config.from_object("settings.FlaskSetting")
 
   - jsonify({k:v}):返回一个json字符串，并在响应头中添加`Content-Type:application/json`
 
+摸板文件编写参看[janjia2](./jinajia2.md)
+
 ### request请求
 
 |方法|说明|
