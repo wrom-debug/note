@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="/static/dl.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" charset="utf-8"></script>
+    </head>
+    <body>
+
+        <form action="/dl" class="login-form" method="GET">
+
+		    <h1>垃圾猪小说网</h1>
+			<div style="margin-top:150px">
+				<input type="submit" class="logbtn" value="请登录">
+			</div>
+			
+            
+        </form>
+        <script type="text/javascript">
+            $(".txtb input").on("focus", function(){
+                $(this).addClass("focus");
+            });	
+
+
+            $(".txtb input").on("blur", function(){
+                if($(this).val() == "")
+                $(this).removeClass("focus");
+            });
+            var ws = new WebSocket('ws://127.0.0.1:5000/ws')
+        </script>
+
+    </body>
+</html>
