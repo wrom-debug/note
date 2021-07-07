@@ -1,44 +1,12 @@
 from flask import Flask,render_template,request,session,redirect,send_file
 from pymongo import MongoClient
 
-from geventwebsocket.handler import WebSocketHandler
-from geventwebsocket.server import WSGIServer
-from geventwebsocket.websocket import WebSocket
 
 
 mc=MongoClient("127.0.0.1",27017)
 db=mc['xs']
 app = Flask(__name__)
 app.config['SECRET_KEY']='78912312#KLH$@KHkhdad'
-socket_list = []
-
-@app.route("/ws")
-def ws():
-    print(request.environ)
-    sock = request.environ.get("wsgi.websocket")  # type:WebSocket
-    if not sock :
-        return "请使用WS协议连接"
-    socket_list.append(sock)
-    print(socket_list)
-    # 1 : 连接打开
-    # 2 : 客户端主动关闭连接
-    # 3 : 连接关闭 由服务器发起
-    # 0 : 连接中。。。。。。
-    while 1:
-        try:
-            msg = sock.receive()  # hello
-            print(msg)
-        except:
-            socket_list.remove(sock)
-            break
-        for so in socket_list:
-            try:
-                so.send(msg)
-            except:
-                continue
-
-    return "200OK"
-
 
 @app.route("/")
 def index():
@@ -79,7 +47,4 @@ def home():
 
 
 if __name__ == "__main__":
-    print("正在运行")
-    http_serv = WSGIServer(("0.0.0.0",5000), app, handler_class=WebSocketHandler)  # environment
-    http_serv.serve_forever()
-
+    app.run()

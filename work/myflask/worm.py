@@ -42,7 +42,7 @@ def xs_save(title,name,aouthor,time,data):
     a=db[title].update_one({'name':name},{'$set':{'time':time}})
 
 def xs_db(jg):
-    title=jg["title"]
+    title="xh"
     name=jg["name"]
     aouthor=jg["aouthor"]
     time=jg["time"]
@@ -128,7 +128,7 @@ def main():
     l=len(title_list)
     t=[]
     # global pool
-    for i in range(l):
+    for i in range(1):
         c=xs_title(title_list[i])
         for f in c:
             f["data"]=[] 
@@ -141,9 +141,12 @@ def main():
                 # {'chapter': '第001章 在下孤北辰', 'plot': ''}
                 f['data'].append(j)
                 print(f["name"],h["chapter"],"完成下载")
+
             xs_db(f)
+            
             print(f["name"],"写入数据库")
-                
+            # break
+        # break       
             
     
 def cs_xs_db():
