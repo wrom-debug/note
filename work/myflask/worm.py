@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from lxml import etree
 import re
 from lxml.etree import XPath
+import json
 import multiprocessing
 
 
@@ -33,13 +34,19 @@ def get_html(url):
         return None
 
 def xs_crea(title,name,aouthor,time):
-    gs={'name':name,'key':[{'author':aouthor},{'time':time},{'data':[]}]}
+    gs={'name':name,'key':[{'author':aouthor},{'time':time}]}
     a=db[title].insert_one(gs)
 
 
 def xs_save(title,name,aouthor,time,data):
-    a=db[title].update_one({'name':name},{'$set':{'data':data}})
     a=db[title].update_one({'name':name},{'$set':{'time':time}})
+     
+    with open(f"work/myflask/xs/{name}.txt",'w',encoding= 'UTF-8') as f:
+        for i in data:
+            f.write(i["chapter"])
+            f.write("\n")
+            f.write(i['plot'])
+            f.write("\n")
 
 def xs_db(jg):
     title="xh"
@@ -128,7 +135,7 @@ def main():
     l=len(title_list)
     t=[]
     # global pool
-    for i in range(1):
+    for i in range(l):
         c=xs_title(title_list[i])
         for f in c:
             f["data"]=[] 
@@ -141,12 +148,11 @@ def main():
                 # {'chapter': '第001章 在下孤北辰', 'plot': ''}
                 f['data'].append(j)
                 print(f["name"],h["chapter"],"完成下载")
-
+                
             xs_db(f)
-            
             print(f["name"],"写入数据库")
-            # break
-        # break       
+            
+               
             
     
 def cs_xs_db():
@@ -158,8 +164,9 @@ def cs_xs_db():
     # time="时间"
     # xs_db(title,name,aouthor,time,data)
     # print(db[title].find_one())
-
+    a=db["xh"].find({})
+    print(a)
 
 if __name__ == "__main__":
     main()
-    
+    # cs_xs_db()
