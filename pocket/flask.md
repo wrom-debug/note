@@ -315,3 +315,18 @@ before_request有返回值时的流程:
 ## 摸板-jianjia2
 
 [jianjia2笔记](./jianjia.md)
+
+### websocket
+
+
+## flask-sockets
+
+由于flask2.0配套的werkzeug2.0版本有bug，会导致只有火狐浏览器可以连接websocket成功
+
+使用flask1.0配套的werkzeug1.01版本可以解决
+
+## flask-socketio
+
+前端js库与后端socketio库版本有兼容问题
+
+![socketio兼容](img/31.png "socketio兼容")
