@@ -7,8 +7,26 @@
     <title>Document</title>
 </head>
 <body>
+    <table border="1" cellpadding="10px" cellspacing="">
+        <caption >记录</caption>
+        <tr>
+            <th>文件名称</th>
+            <th>备注</th>
+            <th>下载</th>
+        </tr>
+        {% for foo in jl %}
+        {% for i in foo.jl %}
+        <tr>
+            <td>{{foo.name}}</td>
+            <td>{{i.bz}}</td>
+            <td><a href="/xs/{{i.uuid}}/{{foo.name}}">{{i.uuid}}</a></td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
     <form action="#" enctype='multipart/form-data' method="post"> 
-        <input type="file" name="wj" id="">
+        <input type="file" name="wj" >
+        备注：<input type="text" name="bz" >
         <input type="submit" value="确认"> 
     </form>
    

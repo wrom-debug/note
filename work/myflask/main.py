@@ -27,7 +27,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/dl',methods=['POST','GET'])
-def u():
+def dl():
     if request.method == 'GET':
         return render_template("dl.html")
     if request.method == 'POST':
@@ -60,18 +60,32 @@ def xs():
 @app.route("/lswj",methods=['POST','GET'])
 def lswj():
     if request.method== "GET":
-        return render_template("lswj.html")
+        wj=db["wj"].find()
+        jl=[]
+        for i in wj:
+            jl.append(i)
+        print(jl)
+        return render_template("lswj.html",jl=jl)
     else: 
-        name=str(uuid.uuid4())
-        print(name)
-        os.mkdir("work/myflask/xs/"+name)
+        bz=request.form["bz"]
+        uuid_str=str(uuid.uuid4())
         data=request.files["wj"]
-        data.save("work/myflask/xs/"+name+"/"+data.filename)
+        f=data.filename
+        os.mkdir("work/myflask/static/"+uuid_str)
+        data.save("work/myflask/static/"+uuid_str+"/"+f)
+        lswj_crea(f,uuid_str,bz)
         return redirect("/home")
-
+def lswj_crea(f,uuid,bz):
+    if db["wj"].find_one({"name":f}):
+        db["wj"].update_one({"name":f},{"$push":{"jl":{"bz":bz,"uuid":uuid}}})
+    else:
+        db["wj"].insert_one({"name":f,"jl":[{"bz":bz,"uuid":uuid},]})
 @app.route('/home')
 def home():
     use=session['use']
     return render_template("home.html",use=use)
+@app.route("/xs/<a>/<b>")
+def xz(a,b):
+    return send_file("static/"+a+"/"+b)
 if __name__ == "__main__":
     app.run()
