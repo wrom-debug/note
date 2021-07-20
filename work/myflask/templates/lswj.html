@@ -12,6 +12,7 @@
         <tr>
             <th>文件名称</th>
             <th>备注</th>
+            <th>时间</th>
             <th>下载</th>
         </tr>
         {% for foo in jl %}
@@ -19,6 +20,7 @@
         <tr>
             <td>{{foo.name}}</td>
             <td>{{i.bz}}</td>
+            <td>{{i.time}}</td>
             <td><a href="/xs/{{i.uuid}}/{{foo.name}}">{{i.uuid}}</a></td>
         </tr>
         {% endfor %}

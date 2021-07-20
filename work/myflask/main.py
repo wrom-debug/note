@@ -2,6 +2,7 @@ import uuid
 from flask import Flask,render_template,request,session,redirect,send_file
 from pymongo import MongoClient
 import os
+import time
 
 
 mc=MongoClient("127.0.0.1",27017)
@@ -76,10 +77,11 @@ def lswj():
         lswj_crea(f,uuid_str,bz)
         return redirect("/home")
 def lswj_crea(f,uuid,bz):
+    t=time.time()
     if db["wj"].find_one({"name":f}):
-        db["wj"].update_one({"name":f},{"$push":{"jl":{"bz":bz,"uuid":uuid}}})
+        db["wj"].update_one({"name":f},{"$push":{"jl":{"bz":bz,"uuid":uuid,"time":t}}})
     else:
-        db["wj"].insert_one({"name":f,"jl":[{"bz":bz,"uuid":uuid},]})
+        db["wj"].insert_one({"name":f,"jl":[{"bz":bz,"uuid":uuid,"time":t},]})
 @app.route('/home')
 def home():
     use=session['use']
