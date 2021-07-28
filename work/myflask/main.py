@@ -1,14 +1,18 @@
+from logging import raiseExceptions
 import uuid
 from flask import Flask,render_template,request,session,redirect,send_file
 from pymongo import MongoClient
 import os
 import time
-
+from geventwebsocket.websocket import WebSocket
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
 
 mc=MongoClient("127.0.0.1",27017)
 db=mc['xs']
 app = Flask(__name__)
 app.config['SECRET_KEY']='78912312#KLH$@KHkhdad'
+WS=[]
 
 @app.before_request
 def before():
@@ -44,6 +48,31 @@ def dl():
 def xs_use_crea(user,password):
     gs={"user":user,"password":password}
     a=db['user'].insert_one(gs)
+
+@app.route("/ws")
+def ws():
+    use=session['use']
+    ws=request.environ.get("wsgi.websocket") #type:WebSocket
+    if not ws:
+        return '您使用的是Http协议'
+    WS.append(ws)
+    print(WS)
+    while True:
+        try:
+            msg=ws.receive()
+            print(msg)
+        except:
+            WS.remove(ws)
+            break
+        for i in WS:
+            try:
+                i.send(msg)
+            except:
+                continue
+    return "200"
+@app.route("/lts")
+def lts():
+    return render_template("lts.html")
 
 @app.route("/zc",methods=['POST','GET'])
 def zc():
@@ -90,4 +119,6 @@ def home():
 def xz(a,b):
     return send_file("static/"+a+"/"+b)
 if __name__ == "__main__":
-    app.run()
+    server = WSGIServer(('127.0.0.1', 5000), app, handler_class=WebSocketHandler)
+    print('server start')
+    server.serve_forever()
