@@ -198,6 +198,7 @@ s.equals("hello")
 * public：保护(子类同包可使用)
 
 
+
 ## 类
 
 ~~~java
@@ -266,3 +267,40 @@ static {静态代码块}
 
 匿名代码块：在实例化代码时执行，一般用于设置初始值
 静态代码块：在加载类时执行一次，后续实例化不执行
+
+## 抽象类
+
+~~~java
+
+//抽象类；不可以new，可以有正常的属性和方法；
+public abstract class Dome{
+
+// 抽象方法；抽象方法必须在抽象类中，抽象类中可以没有抽象方法;不写方法体，结构体有非抽象子类重写方法
+  public abstract int get(int i);
+}
+
+class DomIn extends Dome{
+  @Override
+  public int get(int i){
+    System.out.println("重写的方法")
+  }
+
+}
+~~~
+* abstract：抽象
+* 抽象类对非抽象子类强制与规范作用
+  * 强制：方法重写
+  * 规范：重写方法的方法名，返回值，形参类型与个都要与父类中方法一致
+
+## 接口
+
+~~~java
+
+//接口中属性只能是常量，方法也只能是抽象方法
+public interface Inter{
+  public static final int I = 5;
+  public abstract viod show();
+}
+~~~
+* interface：接口
+* implements：接口实现
