@@ -217,7 +217,7 @@ public class Student extends Person{
   }
 
   //方法
-  public viod study(){
+  public void study(){
     return 
   }
 }
@@ -280,6 +280,7 @@ public abstract class Dome{
 }
 
 class DomIn extends Dome{
+  //提示编译器下面方法为重写方法
   @Override
   public int get(int i){
     System.out.println("重写的方法")
@@ -299,8 +300,39 @@ class DomIn extends Dome{
 //接口中属性只能是常量，方法也只能是抽象方法
 public interface Inter{
   public static final int I = 5;
-  public abstract viod show();
+  public abstract void show();
+}
+
+//接口可以被接口继承并且是多继承,多继承用逗号隔开 
+public interface InteA extends Inter,Inter2 {
+  public abstract void show2();
+}
+
+
+//但是接口最后都要由类实现，并且可以实现多个接口
+public class inc implements InteA,Inter {
+  //重写接口方法
+  @Override
+  public void show(){
+    System.out.println("00000")
+  }
 }
 ~~~
 * interface：接口
 * implements：接口实现
+
+~~~java
+
+语法：
+接口/父类类型 引用名 = new 接口/父类类型(){方法重写}
+
+===============================================
+
+实际效果：
+实现接口的类/父类的子类{
+  方法重写
+}
+接口/父类类型 引用名 = new 实现接口的类/父类的子类
+
+~~~
+
