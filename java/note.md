@@ -336,3 +336,21 @@ public class inc implements InteA,Inter {
 
 ~~~
 
+# 异常
+
+~~~java
+
+try{
+  可能报错语句
+} catch(异常类型 变量名){
+  异常处理语句
+} finally{
+  报不报错都执行语句
+}
+
+
+//抛出异常 在方法中使用
+throw nwe  异常类型()  
+~~~
+
+
