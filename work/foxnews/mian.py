@@ -102,7 +102,7 @@ def deal(classifier,data):
         
 
 def mian(classifier,num):
-    主函数
+    # 主函数
     c =num %10
     n =num //10
     # print(n,c)

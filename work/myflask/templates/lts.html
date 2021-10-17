@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table border="1" cellpadding="10px" cellspacing="">
+        <tr>
+            <th>聊天室</th>
+        </tr>
+        <tr id="mesg">
+            <td></td>
+        </tr>
+    </table>
+        <input type="text" name="msg" id="msg" >
+        <input type="button" value="确认" id="sss"> 
+    </form>
+   
+</body>
+<script type="application/javascript">
+    var ws = new WebSocket('ws://398p2n4007.qicp.vip/ws');   //建立websocket链接
+    ws.onmessage = function (messageEvent) {
+        var a=document.createElement("td");
+        a.innerText=messageEvent.data;
+        var b=document.getElementById("mesg");
+        b.appendChild(a);
+    };
+
+    var send=document.getElementById("sss");
+    send.onclick=function(){
+        var a=document.getElementById("msg")
+        console.log(a.value);
+        ws.send(a.value)
+        a.value=""
+    }
+</script>
+</html>
