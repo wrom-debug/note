@@ -11,7 +11,7 @@ pip3 install virtualenv
 在当前路径下创建虚拟环境
 
 ~~~shell
-virtyalenv 新环境名称
+virtualenv 新环境名称
 --no-site-packages 不使用本地包
 --python 指定python.exe文件
 ~~~
