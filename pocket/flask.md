@@ -318,7 +318,6 @@ before_request有返回值时的流程:
 
 ## websocket
 
-
 ### flask-sockets
 
 由于flask2.0配套的werkzeug2.0版本有bug，会导致只有火狐浏览器可以连接websocket成功
