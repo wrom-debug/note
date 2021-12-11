@@ -390,7 +390,7 @@ def when(fun):
       end=time.time()
       return ret
    return whens
-@method_decorator(when,name="get")  #方法三
+@method_decorator(when,name="get")  #方法三 给视图类的指定方法设置装饰器
 class MyView(View):
 
       def dispatch(self,request,*args,**kwargs):
@@ -398,8 +398,9 @@ class MyView(View):
          ret=super().dispatch(request,*args,**kwargs)
          end=time.time()
          return ret
-         #方式一
-      @method_decorator(when) #方法二
+         #方式一 视图类所有请求类型都会执行这个方法所以可以利用这个方法实现装饰器的效果
+
+      @method_decorator(when) #方法二 给视图类的方法设置装饰器
       def get(self, request):
             return HttpResponse('OK')
 
