@@ -258,6 +258,20 @@ url分发就是将app01匹配的内容再放到app01下的urls中进行匹配，
 
 ### URL别名
 
+~~~python
+
+from django.conf.urls import url
+from django.contrib import admin
+from app01 import views
+
+urlpatterns = [
+   # url(r'^admin/', admin.site.urls),
+   url(r'^$', views.app01base,name="from"), 
+   # 模板中使用url时可以使用{% url ‘form’ %}来匹配对应的url，不管前面的url怎么变更
+]
+
+~~~
+
 ## 视图
 
 ### 请求(request)相关属性方法
