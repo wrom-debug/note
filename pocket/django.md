@@ -774,8 +774,9 @@ pymysql.install_as_MYSQLdb()
 
 ~~~shell
 
-python manage.py makemigrations
-python manage.py migrate
+python manage.py makemigrations  app名称 #更新模型，每次都会生成新的文件保存到migrations中
+python manage.py sqlmigrate app名称 对应编号 #查看对应编号会执行的sql语句
+python manage.py migrate   #执行所有migrations中的文件将其执行到连接的数据库中
 ~~~
 
 ### 单表操作
