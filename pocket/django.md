@@ -792,7 +792,7 @@ student_obj=models.Student(
    name='xxx',
    age=18
 )
-student_obj.seve()
+student_obj.save()
 
 创建记录：方式2
 nwe_obj=models.Student.objects.create(name='oo',age=18)
