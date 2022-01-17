@@ -141,6 +141,7 @@ print(title)
 - response.xpath("xpath匹配语句")
   - .get()/extract_first()    #获取一个匹配对象
   - .getall()/extract()   #获取多个匹配对象列表
+  - .attrib['属性名称'] #获取属性值
 - response.css("css选择器")
   - .get()/extract_first()    #获取一个匹配对象
   - .getall()/extract()   #获取多个匹配对象列表
